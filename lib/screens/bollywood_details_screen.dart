@@ -2,6 +2,7 @@ import 'package:asb_news/utils/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
+
 class BollyWoodDetailsScreen extends StatefulWidget {
   final id;
   final title;
