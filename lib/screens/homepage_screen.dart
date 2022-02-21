@@ -45,6 +45,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
     // setState(() {});
   }
 
+  double screenHeight = 0;
+  double screenWidth = 0;
+
   void initState() {
     // TODO: implement initState
     getTabBarDetails();
@@ -53,6 +56,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
     return DefaultTabController(
       length: 5,
       child: Scaffold(

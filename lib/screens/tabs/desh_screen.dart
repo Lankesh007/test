@@ -208,6 +208,7 @@ class _DeshScreenState extends State<DeshScreen> {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),
+                                        maxLines: 3,
                                       ),
                                     ),
                                     Container(

@@ -207,6 +207,7 @@ class _BollyWoodScreenState extends State<BollyWoodScreen> {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),
+                                        maxLines: 3,
                                       ),
                                     ),
                                     Container(

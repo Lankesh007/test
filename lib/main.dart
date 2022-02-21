@@ -1,8 +1,11 @@
-import 'package:asb_news/screens/select_state_screen.dart';
 import 'package:asb_news/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+
   runApp(const MyApp());
 }
 
@@ -33,6 +36,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
+    // _bannerAd = BannerAd(
+    //     size: AdSize.banner,
+    //     adUnitId: AdHelper.bannerAdUnitId,
+    //     listener: BannerAdListener(onAdLoaded: (_) {
+    //       setState(
+    //         () {
+    //           _isBannerAdReady = true;
+    //         },
+    //       );
+    //     }, onAdFailedToLoad: (ad, error) {
+    //       print("Failed to  load banner Ads{error.message}");
+    //       _isBannerAdReady = false;
+    //       ad.dispose();
+    //     }),
+    //     request: AdRequest())
+    //   ..load();
+
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.push(
         context,
