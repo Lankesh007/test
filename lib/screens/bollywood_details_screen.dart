@@ -1,3 +1,4 @@
+import 'package:asb_news/screens/dhamakedar_news.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -38,6 +39,17 @@ class _BollyWoodDetailsScreenState extends State<BollyWoodDetailsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DhamakedarNewsScreen()));
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            )),
         centerTitle: true,
       ),
       body: widget.id == null

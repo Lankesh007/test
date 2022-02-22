@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:asb_news/ad_helper.dart';
 import 'package:asb_news/models/default_news_model.dart';
 import 'package:asb_news/models/news_by_select_district_model.dart';
 import 'package:asb_news/screens/google_ads_screen.dart';
@@ -24,12 +23,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<DefaultNewsModel> defaultNews = [];
-
+  var result;
   Future getDefaultNewss() async {
     var url = Settings.defaultNews;
     var res = await GlobalFunction.apiGetRequestae(url);
-    // print(res);
-    var result = jsonDecode(res);
+    result = jsonDecode(res);
     var _cryptoList = result as List;
     setState(() {
       defaultNews.clear();
@@ -40,13 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<NewsBySelectDistrict> districtNewsList = [];
-  var result;
+  var results;
   Future getNewsBySelectDistrict() async {
     var url = Settings.newsSelectByDistrict + widget.districtId;
     var res = await GlobalFunction.apiGetRequestae(url);
     // print(res);
-    result = jsonDecode(res);
-    var _cryptoList = result as List;
+    results = jsonDecode(res);
+    var _cryptoList = results as List;
     setState(() {
       districtNewsList.clear();
       var listdata =
@@ -55,30 +53,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  late List<String> allRows;
-  late List<Object> itemList;
-  // void initState() {
-  //   getDefaultNewss();
-  //   getNewsBySelectDistrict();
-  //   super.initState();
-  //   allRows = [];
-
-  //   for (int i = 1; i <= 20; i++) {
-  //     allRows.add("Row $i");
-  //   }
-
-  //   itemList = List.from(allRows);
-  //   for (int i = itemList.length - 5; i >= 1; i -= 5) {
-  //     itemList.insert(i, AdMobService.createBannerAd()..load());
-  //   }
-  // }
-  late BannerAd _bannerAd;
-  bool _isBannerAdReady = false;
   @override
+  // ignore: must_call_super
   void initState() {
     getDefaultNewss();
     getNewsBySelectDistrict();
-    AdMobService.createBannerAd()..load();
   }
 
   double screenHeight = 0;
@@ -89,14 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      // bottomNavigationBar: Container(
-      //   height: 60,
-      //   child: AdWidget(
-      //     ad: AdMobService.createBannerAd()..load(),
-      //     key: UniqueKey(),
-      //   ),
-      // ),
-      // backgroundColor: Colors.grey.shade300,
       body: result == null
           ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -118,47 +89,12 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           : ListView(
               children: [
-                // SizedBox(
-                //   height: screenHeight / 3,
-                //   child: ListView.builder(
-                //     addAutomaticKeepAlives: true,
-                //     itemBuilder: (context, i) {
-                //       if (itemList[i] is String) {
-                //         return ListTile(
-                //           title: Text(itemList[i].toString()),
-                //           trailing: IconButton(
-                //               onPressed: () {},
-                //               icon: Icon(
-                //                 Icons.arrow_back,
-                //               )),
-                //         );
-                //       } else {
-                //         final Container adContainer = Container(
-                //           height: 50,
-                //           alignment: Alignment.center,
-                //           child: AdWidget(
-                //             ad: itemList[i] as BannerAd..load(),
-                //             key: UniqueKey(),
-                //           ),
-                //         );
-                //         return adContainer;
-                //       }
-                //     },
-                //     itemCount: itemList.length,
-                //   ),
-                // ),
-                Container(
-                    height: 50,
-                    child: AdWidget(
-                      ad: AdMobService.createBannerAd()..load(),
-                      key: UniqueKey(),
-                    )),
                 topBannerWidget(),
                 Column(
                   children: [
                     Container(
                       child: SizedBox(
-                        height: MediaQuery.of(context).size.height / 1.48,
+                        height: MediaQuery.of(context).size.height / 1.45,
                         width: MediaQuery.of(context).size.width,
                         child: ListView.builder(
                           scrollDirection: Axis.vertical,
@@ -177,60 +113,61 @@ class _HomeScreenState extends State<HomeScreen> {
                 Column(
                   children: [
                     Container(
-                        height: screenHeight / 2,
-                        width: screenWidth / 1.04,
-                        child: Card(
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: themeColor,
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(5),
-                                        )),
-                                    alignment: Alignment.center,
-                                    height: screenHeight / 25,
-                                    width: screenWidth / 5,
-                                    child: Text(
-                                      widget.districtName,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Divider(
+                      height: screenHeight / 2,
+                      width: screenWidth / 1.04,
+                      child: Card(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
                                       color: themeColor,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(5),
+                                      )),
+                                  alignment: Alignment.center,
+                                  height: screenHeight / 25,
+                                  width: screenWidth / 5,
+                                  child: Text(
+                                    widget.districtName,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height / 2.5,
-                                width: MediaQuery.of(context).size.width,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  // physics: NeverScrollableScrollPhysics(),
-                                  // reverse: false,
-                                  // shrinkWrap: true,
-                                  itemCount: districtNewsList.length,
-                                  itemBuilder: (context, index) =>
-                                      selectedNewsDetailsWidget(
-                                    districtNewsList[index],
                                   ),
                                 ),
+                                Container(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Divider(
+                                    color: themeColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height / 2.5,
+                              width: MediaQuery.of(context).size.width,
+                              child: ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                // physics: NeverScrollableScrollPhysics(),
+                                // reverse: false,
+                                // shrinkWrap: true,
+                                itemCount: districtNewsList.length,
+                                itemBuilder: (context, index) =>
+                                    selectedNewsDetailsWidget(
+                                  districtNewsList[index],
+                                ),
                               ),
-                            ],
-                          ),
-                        )),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
+                bannerAdWidget(),
                 Container(
                   height: screenHeight / 3,
                   width: screenWidth / 1.01,
@@ -262,22 +199,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(
                           height: 10,
                         ),
-                        // Container(
-                        //   child: SizedBox(
-                        //     height: MediaQuery.of(context).size.height / 4,
-                        //     width: MediaQuery.of(context).size.width,
-                        //     child: ListView.builder(
-                        //       scrollDirection: Axis.horizontal,
-                        //       // physics: NeverScrollableScrollPhysics(),
-                        //       reverse: false,
-                        //       // shrinkWrap: true,
-                        //       itemCount: relatedNewsList.length,
-                        //       itemBuilder: (context, index) => relatedNewsWidget(
-                        //         relatedNewsList[index],
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                         relatedNewsWidget(),
                       ],
                     ),
@@ -286,6 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 10,
                 ),
+                bannerAdWidget(),
                 Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -314,6 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 popularNewsWidget(),
+                bannerAdWidget(),
               ],
             ),
     );
@@ -584,6 +507,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 

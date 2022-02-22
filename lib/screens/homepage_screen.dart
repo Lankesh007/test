@@ -59,7 +59,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     return DefaultTabController(
-      length: 5,
+      length: 11,
       child: Scaffold(
         drawer: Drawer(
           child: ListView(
@@ -104,35 +104,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   left: 10,
                                 ),
                                 child: Text(
-                                  "घर",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )),
-                            // "Home",
-                          ),
-                          Tab(
-                            child: Container(
-                                margin: const EdgeInsets.only(
-                                  left: 10,
-                                ),
-                                child: Text(
-                                  "अध्यात्म",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )),
-                            // "Home",
-                          ),
-                          Tab(
-                            child: Container(
-                                margin: const EdgeInsets.only(
-                                  left: 10,
-                                ),
-                                child: Text(
-                                  "उत्तर प्रदेश",
+                                  "होम",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -160,7 +132,119 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   left: 10,
                                 ),
                                 child: Text(
+                                  "प्रदेश",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
+                                  "जनपद",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
+                                  "खेल",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
                                   "बॉलीवुड",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
+                                  "टैकनोलजी",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
+                                  "अध्यात्म",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
+                                  "दुनिया",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
+                                  "हेलथी",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                            // "Home",
+                          ),
+                          Tab(
+                            child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 10,
+                                ),
+                                child: Text(
+                                  "व्यापार",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -200,6 +284,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
             AdhyatmicScreen(),
             UttarPradeshScreen(),
             DeshScreen(),
+            BollyWoodScreen(),
+            BollyWoodScreen(),
+            BollyWoodScreen(),
+            BollyWoodScreen(),
+            BollyWoodScreen(),
+            BollyWoodScreen(),
             BollyWoodScreen(),
           ],
         ),
