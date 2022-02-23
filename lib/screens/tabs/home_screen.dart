@@ -9,59 +9,40 @@ import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
-  final districtId;
-  final districtName;
-  const HomeScreen(
-      {required this.districtId, required this.districtName, Key? key})
-      : super(key: key);
+  final String districtId;
+  final String districtName;
+  const HomeScreen({
+    required this.districtId,
+    required this.districtName,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<DefaultNewsModel> defaultNews = [];
-  var result;
-  Future getDefaultNewss() async {
-    var url = Settings.defaultNews;
-    var res = await GlobalFunction.apiGetRequestae(url);
-    result = jsonDecode(res);
-    var _cryptoList = result as List;
-    setState(() {
-      defaultNews.clear();
-      var listdata =
-          _cryptoList.map((e) => DefaultNewsModel.fromjson(e)).toList();
-      defaultNews.addAll(listdata);
-    });
-  }
-
-  List<NewsBySelectDistrict> districtNewsList = [];
-  var results;
-  Future getNewsBySelectDistrict() async {
-    var url = Settings.newsSelectByDistrict + widget.districtId;
-    var res = await GlobalFunction.apiGetRequestae(url);
-    // print(res);
-    results = jsonDecode(res);
-    var _cryptoList = results as List;
-    setState(() {
-      districtNewsList.clear();
-      var listdata =
-          _cryptoList.map((e) => NewsBySelectDistrict.fromjson(e)).toList();
-      districtNewsList.addAll(listdata);
-    });
-  }
-
-  @override
-  // ignore: must_call_super
-  void initState() {
-    getDefaultNewss();
-    getNewsBySelectDistrict();
-  }
-
   double screenHeight = 0;
   double screenWidth = 0;
+  var result;
+  var _prefences;
+  List<DefaultNewsModel> defaultNews = [];
+
+  @override
+  void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      _initFunction();
+    });
+  }
+
+  _initFunction() async {
+    getDefaultNewss();
+    getNewsBySelectDistrict();
+    _prefences = await SharedPreferences.getInstance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -604,5 +585,37 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+//-----------------------------------------------------------Api Call
+  Future getDefaultNewss() async {
+    var url = Settings.defaultNews;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+    var _cryptoList = result as List;
+    setState(() {
+      defaultNews.clear();
+      var listdata =
+          _cryptoList.map((e) => DefaultNewsModel.fromjson(e)).toList();
+      defaultNews.addAll(listdata);
+    });
+  }
+
+  List<NewsBySelectDistrict> districtNewsList = [];
+  var results;
+  Future getNewsBySelectDistrict() async {
+    var url = Settings.newsSelectByDistrict +
+        widget.districtId.toString().replaceAll('[', '').replaceAll(']', '');
+
+    var res = await GlobalFunction.apiGetRequestae(url);
+    // print(res);
+    results = jsonDecode(res);
+    var _cryptoList = results as List;
+    setState(() {
+      districtNewsList.clear();
+      var listdata =
+          _cryptoList.map((e) => NewsBySelectDistrict.fromjson(e)).toList();
+      districtNewsList.addAll(listdata);
+    });
   }
 }

@@ -20,13 +20,11 @@ class _AdhyatmicScreenState extends State<AdhyatmicScreen> {
     var url = Settings.adhyatmicDetails;
     var res = await GlobalFunction.apiGetRequestae(url);
     result = jsonDecode(res);
-    var _cryptoList = result as List;
-
+    var dataList = result as List;
     setState(() {
       adhyatmicDetailsList.clear();
-
       var listdata =
-          _cryptoList.map((e) => AdhyatmicDetailsModel.fromjson(e)).toList();
+          dataList.map((e) => AdhyatmicDetailsModel.fromjson(e)).toList();
       adhyatmicDetailsList.addAll(listdata);
     });
   }

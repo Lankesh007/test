@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:asb_news/models/select_district_model.dart';
 import 'package:asb_news/screens/homepage_screen.dart';
 import 'package:asb_news/utils/api.dart';
@@ -36,42 +35,37 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
   }
 
   List<SelectDistrictModel> districtCategory = [];
+  List<String> districtNameList = [];
+  List<String> districtIdList = [];
   double screenHeight = 0;
   double screenWidth = 0;
-  // String districtId = "";
-  // String districtName = "";
 
   Future getDistrictCategory() async {
     var url = Settings.selectDistrictCategory + widget.stateId;
     var res = await GlobalFunction.apiGetRequestae(url);
+    print(res);
 
     var result = jsonDecode(res);
-    var _cryptoList = result as List;
+    var dataList = result as List;
     setState(() {
       districtCategory.clear();
       var listdata =
-          _cryptoList.map((e) => SelectDistrictModel.fromjson(e)).toList();
+          dataList.map((e) => SelectDistrictModel.fromjson(e)).toList();
       districtCategory.addAll(listdata);
     });
-    // districtId = result[0]["id"].toString();
-    // districtName = result[0]["name"].toString();
-    // log("Id===>" + districtId + "++++" + districtName);
-    // setState(() {});
   }
 
   String valuefirst = "";
-  var checkValue;
+  SharedPreferences? _preferences;
   Future saveSelectdData() async {
-    if (valuefirst == true) {
-      checkValue = await SharedPreferences.getInstance();
-    }
-    checkValue = valuefirst;
+    _preferences = await SharedPreferences.getInstance();
   }
 
   @override
   void initState() {
     // TODO: implement initState
     getDistrictCategory();
+    saveSelectdData();
     super.initState();
   }
 
@@ -97,7 +91,7 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
       body: ListView(
         children: [
           Container(
-            height: screenHeight / 1.2,
+            height: screenHeight / 1.25,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -112,26 +106,104 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
                       itemCount: districtCategory.length,
                       itemBuilder: (context, i) {
                         return Container(
-                          margin:
-                              EdgeInsets.only(bottom: 10, left: 10, right: 10),
-                          child: Container(
-                            child: CheckboxListTile(
-                              onChanged: (val) {
+                          child: ListTile(
+                            title: Text(
+                              districtCategory[i].districtName,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: InkWell(
+                              onTap: () {
                                 setState(() {
-                                  valuefirst = [i].toString();
-                                  districtCategory[i].districtId;
-                                  disId = districtCategory[i].districtId;
-                                  distName = districtCategory[i].districtName;
+                                  districtCategory[i].isSelected =
+                                      !districtCategory[i].isSelected;
+
+                                  print("Selected--->Exc-->" +
+                                      districtCategory[i]
+                                          .isSelected
+                                          .toString());
+
+                                  if (districtCategory[i].isSelected == true) {
+                                    setState(() {
+                                      districtIdList.add(districtCategory[i]
+                                          .districtId
+                                          .toString());
+                                      districtNameList.add(
+                                        districtCategory[i]
+                                            .districtName
+                                            .toString(),
+                                      );
+                                    });
+                                  } else {
+                                    setState(() {
+                                      int pos = districtIdList.indexWhere(
+                                        (element) =>
+                                            element ==
+                                            districtCategory[i]
+                                                .districtId
+                                                .toString(),
+                                      );
+
+                                      if (pos >= 0) {
+                                        districtIdList.removeAt(pos);
+                                        districtNameList.removeAt(pos);
+                                      }
+                                      if (districtIdList.length <= 0) {
+                                        districtIdList.clear();
+                                        districtNameList.clear();
+                                      }
+                                    });
+                                  }
                                 });
+                                print(
+                                  'Value find here:==>' +
+                                      districtIdList.toString(),
+                                );
+                                print("Name find here:==>" +
+                                    districtNameList.toString());
                               },
-                              value:
-                                  valuefirst == [i].toString() ? true : false,
-                              title: Text(
-                                districtCategory[i].districtName,
+                              child: Container(
+                                alignment: Alignment.center,
+                                height: 25,
+                                width: 25,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                  width: 1,
+                                )),
+                                child: (districtCategory[i].isSelected == true)
+                                    ? Icon(
+                                        Icons.check,
+                                        color: themeColor,
+                                        size: 20,
+                                      )
+                                    : Container(),
                               ),
                             ),
                           ),
                         );
+                        // return Container(
+                        //   margin:
+                        //       EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                        //   child: Container(
+                        //     child: CheckboxListTile(
+                        //       onChanged: (val) {
+                        //         setState(() {
+                        //           valuefirst = [i].toString();
+                        //           districtCategory[i].districtId;
+                        //           disId = districtCategory[i].districtId;
+                        //           distName = districtCategory[i].districtName;
+                        //         });
+                        //       },
+                        //       value:
+                        //           valuefirst == [i].toString() ? true : false,
+                        //       title: Text(
+                        //         districtCategory[i].districtName,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // );
                       }),
                 ),
               ],
@@ -154,37 +226,45 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
   }
 
   Widget newsButtonWidget() {
-    return InkWell(
-      onTap: () {
-        if (valuefirst != "") {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => HomePageScreen(
-                        districtId: disId.toString(),
-                        districtName: distName.toString(),
-                      )));
-        } else {
-          _showToast(context);
-        }
-      },
-      child: Container(
-        alignment: Alignment.center,
-        height: screenHeight / 18,
-        width: screenWidth / 1.1,
-        decoration: BoxDecoration(
-          color: themeColor,
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-        ),
-        child: Text(
-          "Next",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            if (districtIdList.length > 0) {
+              _preferences!.setStringList('idDistrict', districtIdList);
+              _preferences!.setStringList('namedistrict', districtNameList);
+              _preferences!.setString('isInit', 'true');
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomePageScreen(
+                            districtId: districtIdList.toString(),
+                            districtName: districtNameList.toString(),
+                          )));
+            } else {
+              _showToast(context);
+            }
+          },
+          child: Container(
+            alignment: Alignment.center,
+            height: screenHeight / 18,
+            width: screenWidth / 1.1,
+            decoration: BoxDecoration(
+              color: themeColor,
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
+            child: Text(
+              "Next",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

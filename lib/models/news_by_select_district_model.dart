@@ -5,6 +5,7 @@ class NewsBySelectDistrict {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  bool isSelected = false;
 
   NewsBySelectDistrict({
     required this.newsId,
@@ -13,6 +14,7 @@ class NewsBySelectDistrict {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.isSelected,
   });
 
   factory NewsBySelectDistrict.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class NewsBySelectDistrict {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      isSelected: false,
     );
   }
   Map<String, dynamic> tojson() {

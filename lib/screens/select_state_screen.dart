@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:asb_news/main.dart';
 import 'package:asb_news/models/select_state_model.dart';
 import 'package:asb_news/screens/homepage_screen.dart';
 import 'package:asb_news/screens/select_district_screen.dart';
@@ -23,7 +22,7 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
     var url = Settings.seelctStateCategory;
     var res = await GlobalFunction.apiGetRequestae(url);
     print(res);
-    var result = jsonDecode(res);
+    var result = json.decode(res);
     if (result["status"] == 1) {
       var _cryptoList = result['data'] as List;
       setState(() {
@@ -62,8 +61,8 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => HomePageScreen(
-                            districtId: null,
-                            districtName: null,
+                            districtId: "",
+                            districtName: "",
                           )));
             },
             child: Text(

@@ -13,8 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class HomePageScreen extends StatefulWidget {
-  final districtId;
-  final districtName;
+  final String districtId;
+  final String districtName;
   const HomePageScreen(
       {required this.districtId, required this.districtName, Key? key})
       : super(key: key);

@@ -1,16 +1,19 @@
 class SelectDistrictModel {
   String districtName = "";
   String districtId = "";
+  bool isSelected = false;
 
   SelectDistrictModel({
     required this.districtName,
     required this.districtId,
+    required this.isSelected,
   });
 
   factory SelectDistrictModel.fromjson(Map<String, dynamic> json) {
     return SelectDistrictModel(
       districtName: json["name"].toString(),
       districtId: json["id"].toString(),
+      isSelected: false,
     );
   }
   Map<String, dynamic> tojson() {

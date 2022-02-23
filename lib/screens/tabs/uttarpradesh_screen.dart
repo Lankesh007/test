@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:asb_news/models/news_by_select_district_model.dart';
 import 'package:asb_news/models/select_district_model.dart';
 import 'package:asb_news/models/select_state_model.dart';
@@ -13,110 +12,44 @@ import 'package:flutter/material.dart';
 
 class UttarPradeshScreen extends StatefulWidget {
   const UttarPradeshScreen({Key? key}) : super(key: key);
-
   @override
   _UttarPradeshScreenState createState() => _UttarPradeshScreenState();
 }
 
 class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
-  bool isState = true;
-  bool isDistrict = true;
   List<UttarPradeshDetailsModel> uttarPradeshList = [];
-  var result;
-  Future getUttarPradeshDetails() async {
-    var url = Settings.uttarpradershDetails;
-    var res = await GlobalFunction.apiGetRequestae(url);
-    result = jsonDecode(res);
-    var _cryptoList = result as List;
+  List<SelectStateModel> stateCategory = [];
+  List<SelectDistrictModel> districtCategory = [];
 
-    setState(() {
-      uttarPradeshList.clear();
-      var listdata =
-          _cryptoList.map((e) => UttarPradeshDetailsModel.fromjson(e)).toList();
-      uttarPradeshList.addAll(listdata);
-    });
-  }
+  List<NewsBySelectDistrict> districtNewsList = [];
 
   void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      _initFunction();
+    });
+    super.initState();
+  }
+
+  _initFunction() async {
     getUttarPradeshDetails();
     getStateCategory();
     getDistrictCategory(stateId);
     getNewsBySelectDistrict(districtId);
-
-    super.initState();
   }
 
+  var result;
+  bool isState = true;
+  bool isDistrict = true;
   double screenHeight = 0;
   double screenWidth = 0;
-  List<SelectStateModel> stateCategory = [];
-
-  Future getStateCategory() async {
-    var url = Settings.seelctStateCategory;
-    var res = await GlobalFunction.apiGetRequestae(url);
-    print(res);
-    var result = jsonDecode(res);
-    if (result["status"] == 1) {
-      var _cryptoList = result['data'] as List;
-      setState(() {
-        stateCategory.clear();
-        var listdata =
-            _cryptoList.map((e) => SelectStateModel.fromjson(e)).toList();
-        stateCategory.addAll(listdata);
-      });
-    }
-  }
-
+  String stateId = "";
   bool isSelectd = false;
   String districtId = "";
   int index = 0;
-  List<SelectDistrictModel> districtCategory = [];
-  String stateId = "";
-  Future getDistrictCategory(String stateId) async {
-    var url = Settings.selectDistrictCategory + stateId;
-    var res = await GlobalFunction.apiGetRequestae(url);
-
-    var result = jsonDecode(res);
-    var _cryptoList = result as List;
-    setState(() {
-      districtCategory.clear();
-      var listdata =
-          _cryptoList.map((e) => SelectDistrictModel.fromjson(e)).toList();
-      districtCategory.addAll(listdata);
-      // distId = districtCategory[index].districtId;
-
-      // if (distId == districtId) {
-      //   isSelectd = true;
-      // }
-      if (districtCategory.length > 0) {
-        isState = false;
-        // districtId = districtCategory.elementAt(0).districtId;
-        // getNewsBySelectDistrict(districtId);
-      }
-    });
-  }
-
-  List<NewsBySelectDistrict> districtNewsList = [];
   var results;
-  // String distId = "";
   bool isData = true;
-
-  Future getNewsBySelectDistrict(districtId) async {
-    var url = Settings.newsSelectByDistrict + districtId;
-    var res = await GlobalFunction.apiGetRequestae(url);
-    // print(res);
-    results = jsonDecode(res);
-    var _cryptoList = results as List;
-    setState(() {
-      districtNewsList.clear();
-      var listdata =
-          _cryptoList.map((e) => NewsBySelectDistrict.fromjson(e)).toList();
-      districtNewsList.addAll(listdata);
-
-      if (districtNewsList.length > 0) {
-        isData = false;
-      }
-    });
-  }
+  var sId;
+  var disId;
 
   @override
   @override
@@ -401,12 +334,21 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
       children: [
         InkWell(
           onTap: () {
+            setState(() {
+              sId = itemss.stateId;
+            });
             getDistrictCategory(itemss.stateId);
           },
           child: Container(
             margin: const EdgeInsets.symmetric(
               horizontal: 20,
             ),
+            decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(
+              width: 2,
+              color: sId == itemss.stateId ? Colors.white : themeColor,
+            ))),
             child: Text(
               itemss.stateName,
               style: TextStyle(
@@ -428,40 +370,34 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
       children: [
         InkWell(
           onTap: () {
+            setState(() {
+              disId = itemsss.districtId;
+            });
             getNewsBySelectDistrict(itemsss.districtId);
             // if (districtId == distId) {
             //   isSelectd = true;
             // }
           },
-          child: isSelectd == false
-              ? Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
-                  child: Text(
-                    itemsss.districtName,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                )
-              : Container(
-                  color: Colors.pink,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
-                  child: Text(
-                    itemsss.districtName,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      textBaseline: TextBaseline.ideographic,
-                    ),
-                  ),
-                ),
+          child: Container(
+            margin: const EdgeInsets.symmetric(
+              horizontal: 20,
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(
+                width: 2,
+                color: disId == itemsss.districtId ? Colors.white : themeColor,
+              )),
+            ),
+            child: Text(
+              itemsss.districtName,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -549,5 +485,78 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
         ),
       ],
     );
+  }
+
+//---------------------------------API CALL------------------------------//
+  Future getUttarPradeshDetails() async {
+    var url = Settings.uttarpradershDetails;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+    var _cryptoList = result as List;
+
+    setState(() {
+      uttarPradeshList.clear();
+      var listdata =
+          _cryptoList.map((e) => UttarPradeshDetailsModel.fromjson(e)).toList();
+      uttarPradeshList.addAll(listdata);
+    });
+  }
+
+  Future getStateCategory() async {
+    var url = Settings.seelctStateCategory;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    print(res);
+    var result = jsonDecode(res);
+    if (result["status"] == 1) {
+      var _cryptoList = result['data'] as List;
+      setState(() {
+        stateCategory.clear();
+        var listdata =
+            _cryptoList.map((e) => SelectStateModel.fromjson(e)).toList();
+        stateCategory.addAll(listdata);
+      });
+    }
+  }
+
+  Future getDistrictCategory(String stateId) async {
+    var url = Settings.selectDistrictCategory + stateId;
+    var res = await GlobalFunction.apiGetRequestae(url);
+
+    var result = jsonDecode(res);
+    var _cryptoList = result as List;
+    setState(() {
+      districtCategory.clear();
+      var listdata =
+          _cryptoList.map((e) => SelectDistrictModel.fromjson(e)).toList();
+      districtCategory.addAll(listdata);
+      // distId = districtCategory[index].districtId;
+
+      // if (distId == districtId) {
+      //   isSelectd = true;
+      // }
+      if (districtCategory.length > 0) {
+        isState = false;
+        // districtId = districtCategory.elementAt(0).districtId;
+        // getNewsBySelectDistrict(districtId);
+      }
+    });
+  }
+
+  Future getNewsBySelectDistrict(districtId) async {
+    var url = Settings.newsSelectByDistrict + districtId;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    // print(res);
+    results = jsonDecode(res);
+    var _cryptoList = results as List;
+    setState(() {
+      districtNewsList.clear();
+      var listdata =
+          _cryptoList.map((e) => NewsBySelectDistrict.fromjson(e)).toList();
+      districtNewsList.addAll(listdata);
+
+      if (districtNewsList.length > 0) {
+        isData = false;
+      }
+    });
   }
 }
