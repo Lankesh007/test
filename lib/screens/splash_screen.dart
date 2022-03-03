@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:asb_news/screens/homepage_screen.dart';
 import 'package:asb_news/screens/select_state_screen.dart';
 import 'package:asb_news/utils/color.dart';
+import 'package:asb_news/utils/constantKey.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,9 +16,14 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+
   SharedPreferences? _preferences;
-  List<String> idList = [];
-  List<String> nameList = [];
+  List<String?> idList = [];
+  List<String?> titleList = [];
+  bool isInit = false;
+  String? token ='';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,32 +47,36 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    saveData();
-
     super.initState();
+    _initPref();
   }
 
-  Future saveData() async {
+
+  Future _initPref() async {
+     token  = await FirebaseMessaging.instance.getToken();
+    log('Token==>  $token');
+
     _preferences = await SharedPreferences.getInstance();
-    String isInit = "";
-    setState(() {
-      if (idList.length > 0) {
-        isInit = _preferences!.getString('isInit').toString();
-        idList = _preferences!.getStringList('idDistrict')!.toList();
-        nameList = _preferences!.getStringList('namedistrict')!.toList();
-      }
-    });
+     isInit = (_preferences!.getBool('$selected')==true)?true:false;
+     if(isInit==true){
+       idList = _preferences!.getStringList('$distIdList')!;
+       titleList = _preferences!.getStringList('$distTitleList')!;
+       log('message==>  ${_preferences!.getBool('$selected')}');
+       log('message==>  ${_preferences!.getStringList('$distIdList')}');
+       log('message==>  ${_preferences!.getStringList('$distTitleList')}');
+     }
     Future.delayed(
       const Duration(seconds: 3),
       () {
-        if (isInit != "") {
+        if (isInit == true) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => HomePageScreen(
-                districtId: idList.toString(),
-                districtName: nameList.toString(),
-              ),
+              builder: (context) =>
+                  HomePageScreen(
+                    districtIdList: idList,
+                    districtNameList: titleList,
+                  ),
             ),
           );
         } else {
@@ -74,7 +87,9 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           );
         }
-      },
+      }
     );
+
+
   }
 }

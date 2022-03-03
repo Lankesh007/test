@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:asb_news/models/desh_deatils_model.dart';
-import 'package:asb_news/screens/deshDetailsScreen.dart';
+import 'package:asb_news/screens/google_ads_screen.dart';
+import 'package:asb_news/screens/samachar_screen.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class DeshScreen extends StatefulWidget {
   const DeshScreen({Key? key}) : super(key: key);
@@ -72,7 +74,7 @@ class _DeshScreenState extends State<DeshScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DeshDetailsScreen(
+                          builder: (context) => SamacharScreen(
                             id: deshDetailsList[0].newsId,
                             title: deshDetailsList[0].newstitle,
                             image: deshDetailsList[0].newsImage,
@@ -116,22 +118,20 @@ class _DeshScreenState extends State<DeshScreen> {
                       )),
                     ),
                   ),
+                  bannerAdWidget(),
                   Container(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        physics: NeverScrollableScrollPhysics(),
-                        reverse: false,
-                        shrinkWrap: true,
-                        itemCount: deshDetailsList.length,
-                        itemBuilder: (context, index) => newsDetailsWidget(
-                          deshDetailsList[index],
-                        ),
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      reverse: false,
+                      itemCount: deshDetailsList.length,
+                      itemBuilder: (context, index) => newsDetailsWidget(
+                        deshDetailsList[index],
                       ),
                     ),
                   ),
+                  bannerAdWidget()
                 ],
               ),
             ),
@@ -141,6 +141,18 @@ class _DeshScreenState extends State<DeshScreen> {
   Widget newWidget(DeshDetailsModel item) {
     return Container(
       child: Text(item.newsId),
+    );
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 
@@ -159,7 +171,7 @@ class _DeshScreenState extends State<DeshScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DeshDetailsScreen(
+                      builder: (context) => SamacharScreen(
                         id: items.newsId,
                         title: items.newstitle,
                         image: items.newsImage,

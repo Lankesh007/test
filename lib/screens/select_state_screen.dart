@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'package:asb_news/models/select_state_model.dart';
 import 'package:asb_news/screens/homepage_screen.dart';
@@ -22,7 +24,7 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
     var url = Settings.seelctStateCategory;
     var res = await GlobalFunction.apiGetRequestae(url);
     print(res);
-    var result = json.decode(res);
+    var result = jsonDecode(res);
     if (result["status"] == 1) {
       var _cryptoList = result['data'] as List;
       setState(() {
@@ -54,27 +56,7 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          FlatButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomePageScreen(
-                            districtId: "",
-                            districtName: "",
-                          )));
-            },
-            child: Text(
-              "Skip",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.red,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          )
-        ],
+        actions: [],
       ),
       body: ListView(
         children: [

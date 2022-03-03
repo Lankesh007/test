@@ -1,22 +1,30 @@
 import 'dart:convert';
-
+import 'dart:developer';
+import 'package:asb_news/models/pushNotification/pushNotification.dart';
 import 'package:asb_news/models/tab_bar_details_model.dart';
 import 'package:asb_news/screens/tabs/adhyatmic_screen.dart';
 import 'package:asb_news/screens/tabs/bollywood_screen.dart';
 import 'package:asb_news/screens/tabs/desh_screen.dart';
+import 'package:asb_news/screens/tabs/dunia_screen.dart';
+import 'package:asb_news/screens/tabs/healthy_screen.dart';
 import 'package:asb_news/screens/tabs/home_screen.dart';
+import 'package:asb_news/screens/tabs/khel_tab_screen.dart';
+import 'package:asb_news/screens/tabs/technology_screen.dart';
 import 'package:asb_news/screens/tabs/uttarpradesh_screen.dart';
+import 'package:asb_news/screens/tabs/vyapar_screen.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:new_version/new_version.dart';
 
 class HomePageScreen extends StatefulWidget {
-  final String districtId;
-  final String districtName;
+  final List districtIdList;
+  final List districtNameList;
+
   const HomePageScreen(
-      {required this.districtId, required this.districtName, Key? key})
+      {required this.districtIdList, required this.districtNameList, Key? key})
       : super(key: key);
 
   @override
@@ -25,6 +33,7 @@ class HomePageScreen extends StatefulWidget {
 
 class _HomePageScreenState extends State<HomePageScreen> {
   List<TabBarDetailsModel> tabBarDetails = [];
+
   Future getTabBarDetails() async {
     var url = Settings.tabBarDetails;
     var res = await GlobalFunction.apiGetRequestae(url);
@@ -51,6 +60,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
   void initState() {
     // TODO: implement initState
     getTabBarDetails();
+    _changeVersion();
+    PushNotificationsManager().init();
     super.initState();
   }
 
@@ -59,7 +70,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     return DefaultTabController(
-      length: 11,
+      length: 10,
       child: Scaffold(
         drawer: Drawer(
           child: ListView(
@@ -132,21 +143,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   left: 10,
                                 ),
                                 child: Text(
-                                  "प्रदेश",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )),
-                            // "Home",
-                          ),
-                          Tab(
-                            child: Container(
-                                margin: const EdgeInsets.only(
-                                  left: 10,
-                                ),
-                                child: Text(
-                                  "जनपद",
+                                  "प्रदेश एवं जनपद",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -188,7 +185,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   left: 10,
                                 ),
                                 child: Text(
-                                  "टैकनोलजी",
+                                  "टेक्नोलॉजी",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -230,7 +227,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   left: 10,
                                 ),
                                 child: Text(
-                                  "हेलथी",
+                                  "हेल्थ",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -278,19 +275,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
         body: TabBarView(
           children: <Widget>[
             HomeScreen(
-              districtId: widget.districtId,
-              districtName: widget.districtName,
+              districtIdList: widget.districtIdList,
+              districtNameList: widget.districtNameList,
             ),
-            AdhyatmicScreen(),
-            UttarPradeshScreen(),
             DeshScreen(),
+            UttarPradeshScreen(),
+            KhelTabScreen(),
             BollyWoodScreen(),
-            BollyWoodScreen(),
-            BollyWoodScreen(),
-            BollyWoodScreen(),
-            BollyWoodScreen(),
-            BollyWoodScreen(),
-            BollyWoodScreen(),
+            TechnologyScreen(),
+            AdhyatmicScreen(),
+            DuniaScreen(),
+            HealthyScreen(),
+            VyaparScreen(),
           ],
         ),
       ),
@@ -462,5 +458,38 @@ class _HomePageScreenState extends State<HomePageScreen> {
         ],
       ),
     );
+  }
+
+  void _changeVersion() async {
+    final newVersion = NewVersion(
+      iOSId: 'com.asbnewsindia',
+      androidId: 'com.asbnewsindia',
+    );
+
+    final status = await newVersion.getVersionStatus();
+    if (status!.localVersion != status.storeVersion) {
+      newVersion.showUpdateDialog(
+        context: context,
+        versionStatus: status,
+        /* dismissButtonText: 'Skip',
+          updateButtonText: 'Update Now',
+          dialogTitle: 'Update Available!',
+          dialogText:
+              'Please Update the app from ${status.localVersion} to ${status.storeVersion}',
+          dismissAction: () {
+            SystemNavigator.pop();
+          }
+           */
+      );
+      log('StoreVersion===> ${status.storeVersion}');
+      log('StoreVersion===> ${status.releaseNotes}');
+      log('DeviceVersion===> ${status.localVersion}');
+    } else {
+      log('Store===> ${status.storeVersion}');
+      log('Local===> ${status.localVersion}');
+    }
+
+    // You can let the plugin handle fetching the status and showing a dialog,
+    // or you can fetch the status and display your own dialog, or no dialog.
   }
 }

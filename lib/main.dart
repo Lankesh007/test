@@ -1,19 +1,26 @@
 import 'package:asb_news/screens/google_ads_screen.dart';
 import 'package:asb_news/screens/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  AdMobService.initialize();
+  await Firebase.initializeApp();
 
+  // FirebaseMessaging.onBackgroundMessage(_messageHandler);
+  AdMobService.initialize();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -70,3 +77,35 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold();
   }
 }
+//
+// Future<void> _messageHandler(RemoteMessage remoteMessage) async {
+//   print("onBackgroundMessage-->"+remoteMessage.notification!.title.toString());
+//
+// }
+
+
+/*
+void _checkUpdate(BuildContext context) async {
+    final newVersion = NewVersion(
+      // iOSId: 'com.dekho.tv',
+      androidId: 'com.dekho.tv',
+    );
+
+    final status = await newVersion.getVersionStatus();
+    newVersion.showUpdateDialog(
+        context: context,
+        versionStatus: status!,
+        dismissButtonText: 'Skip',
+        updateButtonText: 'Update Now',
+        dialogTitle: 'Update Available!',
+        dialogText:
+            'Please Update the app from ${status.localVersion} to ${status.storeVersion}',
+        dismissAction: () {
+          SystemNavigator.pop();
+        });
+    log('Version===> ${status.storeVersion}');
+    log('Version1===> ${status.localVersion}');
+    // You can let the plugin handle fetching the status and showing a dialog,
+    // or you can fetch the status and display your own dialog, or no dialog.
+  }
+ */

@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:asb_news/models/adhyatmic_details_model.dart';
 import 'package:asb_news/screens/adhyatmic_details_screen.dart';
+import 'package:asb_news/screens/google_ads_screen.dart';
+import 'package:asb_news/screens/samachar_screen.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdhyatmicScreen extends StatefulWidget {
   const AdhyatmicScreen({Key? key}) : super(key: key);
@@ -68,7 +71,7 @@ class _AdhyatmicScreenState extends State<AdhyatmicScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AdhyatmicDetailsScreen(
+                        builder: (context) => SamacharScreen(
                           id: adhyatmicDetailsList[0].newsId,
                           title: adhyatmicDetailsList[0].newstitle,
                           image: adhyatmicDetailsList[0].newsImage,
@@ -112,22 +115,20 @@ class _AdhyatmicScreenState extends State<AdhyatmicScreen> {
                     )),
                   ),
                 ),
+                bannerAdWidget(),
                 Container(
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      physics: NeverScrollableScrollPhysics(),
-                      reverse: false,
-                      shrinkWrap: true,
-                      itemCount: adhyatmicDetailsList.length,
-                      itemBuilder: (context, index) => newsDetailsWidget(
-                        adhyatmicDetailsList[index],
-                      ),
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: false,
+                    shrinkWrap: true,
+                    itemCount: adhyatmicDetailsList.length,
+                    itemBuilder: (context, index) => newsDetailsWidget(
+                      adhyatmicDetailsList[index],
                     ),
                   ),
                 ),
+                bannerAdWidget(),
               ],
             ),
     );
@@ -136,6 +137,18 @@ class _AdhyatmicScreenState extends State<AdhyatmicScreen> {
   Widget newWidget(AdhyatmicDetailsModel item) {
     return Container(
       child: Text(item.newsId),
+    );
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 

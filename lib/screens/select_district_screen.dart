@@ -1,14 +1,18 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:asb_news/models/select_district_model.dart';
 import 'package:asb_news/screens/homepage_screen.dart';
+import 'package:asb_news/screens/shared_prefrences.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
+import 'package:asb_news/utils/constantKey.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectDistrictScreen extends StatefulWidget {
   final stateId;
+
   const SelectDistrictScreen({required this.stateId, Key? key})
       : super(key: key);
 
@@ -40,33 +44,20 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
   double screenHeight = 0;
   double screenWidth = 0;
 
-  Future getDistrictCategory() async {
-    var url = Settings.selectDistrictCategory + widget.stateId;
-    var res = await GlobalFunction.apiGetRequestae(url);
-    print(res);
-
-    var result = jsonDecode(res);
-    var dataList = result as List;
-    setState(() {
-      districtCategory.clear();
-      var listdata =
-          dataList.map((e) => SelectDistrictModel.fromjson(e)).toList();
-      districtCategory.addAll(listdata);
-    });
-  }
-
   String valuefirst = "";
   SharedPreferences? _preferences;
-  Future saveSelectdData() async {
-    _preferences = await SharedPreferences.getInstance();
-  }
 
   @override
   void initState() {
-    // TODO: implement initState
-    getDistrictCategory();
-    saveSelectdData();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      saveSelectedData();
+    });
     super.initState();
+  }
+
+  Future saveSelectedData() async {
+    _preferences = await SharedPreferences.getInstance();
+    getDistrictCategory();
   }
 
   String disId = '';
@@ -231,16 +222,15 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
         InkWell(
           onTap: () {
             if (districtIdList.length > 0) {
-              _preferences!.setStringList('idDistrict', districtIdList);
-              _preferences!.setStringList('namedistrict', districtNameList);
-              _preferences!.setString('isInit', 'true');
-
+              _preferences?.setStringList('$distIdList', districtIdList);
+              _preferences?.setStringList('$distTitleList', districtNameList);
+              _preferences?.setBool('$selected', true);
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => HomePageScreen(
-                            districtId: districtIdList.toString(),
-                            districtName: districtNameList.toString(),
+                            districtIdList: districtIdList,
+                            districtNameList: districtNameList,
                           )));
             } else {
               _showToast(context);
@@ -266,5 +256,21 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
         ),
       ],
     );
+  }
+
+  Future getDistrictCategory() async {
+    var url = Settings.selectDistrictCategory + widget.stateId + "&per_page=50";
+    // log(url);
+    var res = await GlobalFunction.apiGetRequestae(url);
+    // log(res);
+
+    var result = jsonDecode(res);
+    var dataList = result as List;
+    setState(() {
+      districtCategory.clear();
+      var listdata =
+          dataList.map((e) => SelectDistrictModel.fromjson(e)).toList();
+      districtCategory.addAll(listdata);
+    });
   }
 }

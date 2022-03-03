@@ -1,7 +1,9 @@
 import 'package:asb_news/screens/dhamakedar_news.dart';
+import 'package:asb_news/screens/google_ads_screen.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class DeshDetailsScreen extends StatefulWidget {
   final id;
@@ -32,10 +34,11 @@ class _DeshDetailsScreenState extends State<DeshDetailsScreen> {
         backgroundColor: themeColor,
         leading: IconButton(
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DhamakedarNewsScreen()));
+              // Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => DhamakedarNewsScreen()));
+              Navigator.pop(context);
             },
             icon: Icon(
               Icons.arrow_back,
@@ -129,6 +132,7 @@ class _DeshDetailsScreenState extends State<DeshDetailsScreen> {
                         ),
                       ),
                     ),
+                    bannerAdWidget(),
                     Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -157,6 +161,7 @@ class _DeshDetailsScreenState extends State<DeshDetailsScreen> {
                       ),
                     ),
                     popularNewsWidget(),
+                    bannerAdWidget(),
                   ],
                 ),
               ],
@@ -320,6 +325,18 @@ class _DeshDetailsScreenState extends State<DeshDetailsScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 }

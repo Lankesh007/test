@@ -3,12 +3,14 @@ import 'package:asb_news/models/news_by_select_district_model.dart';
 import 'package:asb_news/models/select_district_model.dart';
 import 'package:asb_news/models/select_state_model.dart';
 import 'package:asb_news/models/uttarpradesh_details_model.dart';
-import 'package:asb_news/screens/details_by_slected_district.dart';
+import 'package:asb_news/screens/google_ads_screen.dart';
+import 'package:asb_news/screens/samachar_screen.dart';
 import 'package:asb_news/screens/uttar_pradesh_details.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class UttarPradeshScreen extends StatefulWidget {
   const UttarPradeshScreen({Key? key}) : super(key: key);
@@ -202,23 +204,21 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
                               )),
                             ),
                           ),
+                          bannerAdWidget(),
                           Container(
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height,
-                              width: MediaQuery.of(context).size.width,
-                              child: ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                physics: NeverScrollableScrollPhysics(),
-                                reverse: false,
-                                shrinkWrap: true,
-                                itemCount: uttarPradeshList.length,
-                                itemBuilder: (context, index) =>
-                                    newsDetailsWidget(
-                                  uttarPradeshList[index],
-                                ),
+                            child: ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              physics: NeverScrollableScrollPhysics(),
+                              reverse: false,
+                              shrinkWrap: true,
+                              itemCount: uttarPradeshList.length,
+                              itemBuilder: (context, index) =>
+                                  newsDetailsWidget(
+                                uttarPradeshList[index],
                               ),
                             ),
                           ),
+                          bannerAdWidget()
                         ],
                       ),
               ],
@@ -229,6 +229,18 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
   Widget newWidget(UttarPradeshDetailsModel item) {
     return Container(
       child: Text(item.newsId),
+    );
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 
@@ -247,7 +259,7 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UttarPradeshDetailsScreen(
+                      builder: (context) => SamacharScreen(
                         id: items.newsId,
                         title: items.newstitle,
                         image: items.newsImage,
@@ -411,7 +423,7 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SlectNewsByDistrict(
+                builder: (context) => SamacharScreen(
                   id: item.newsId,
                   title: item.newstitle,
                   image: item.newsImage,
@@ -519,7 +531,7 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
   }
 
   Future getDistrictCategory(String stateId) async {
-    var url = Settings.selectDistrictCategory + stateId;
+    var url = Settings.selectDistrictCategory + stateId + "&per_page=50";
     var res = await GlobalFunction.apiGetRequestae(url);
 
     var result = jsonDecode(res);

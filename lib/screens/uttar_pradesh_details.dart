@@ -1,6 +1,8 @@
+import 'package:asb_news/screens/google_ads_screen.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class UttarPradeshDetailsScreen extends StatefulWidget {
   final id;
@@ -102,27 +104,12 @@ class _UttarPradeshDetailsScreenState extends State<UttarPradeshDetailsScreen> {
                             SizedBox(
                               height: 10,
                             ),
-                            // Container(
-                            //   child: SizedBox(
-                            //     height: MediaQuery.of(context).size.height / 4,
-                            //     width: MediaQuery.of(context).size.width,
-                            //     child: ListView.builder(
-                            //       scrollDirection: Axis.horizontal,
-                            //       // physics: NeverScrollableScrollPhysics(),
-                            //       reverse: false,
-                            //       // shrinkWrap: true,
-                            //       itemCount: relatedNewsList.length,
-                            //       itemBuilder: (context, index) => relatedNewsWidget(
-                            //         relatedNewsList[index],
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
                             relatedNewsWidget(),
                           ],
                         ),
                       ),
                     ),
+                    bannerAdWidget(),
                     SizedBox(
                       height: 10,
                     ),
@@ -154,6 +141,7 @@ class _UttarPradeshDetailsScreenState extends State<UttarPradeshDetailsScreen> {
                       ),
                     ),
                     popularNewsWidget(),
+                    bannerAdWidget(),
                   ],
                 ),
               ],
@@ -317,6 +305,18 @@ class _UttarPradeshDetailsScreenState extends State<UttarPradeshDetailsScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 }

@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'package:asb_news/models/popularNewsModel.dart';
 import 'package:asb_news/models/releated_news_model.dart';
-import 'package:asb_news/screens/dhamakedar_news.dart';
+import 'package:asb_news/screens/google_ads_screen.dart';
+import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
+import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class NewsDetaailsScreen extends StatefulWidget {
   final id;
@@ -22,67 +27,23 @@ class NewsDetaailsScreen extends StatefulWidget {
 }
 
 class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
-  List<RelatedNewsModel> relatedNewsList = [
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-    RelatedNewsModel(
-      id: "id",
-      title: "asgflajdbasjdfuilaskdfbaldshewgfshdvbcasghdulV",
-      image:
-          "https://www.davincismind.com/wp-content/uploads/2016/11/055005.jpg",
-      timing: "7 hours ago",
-    ),
-  ];
+  List<RelatedNewsModel> relatedNewsList = [];
+  List<PopularNewsModel> popularNewsList = [];
+  void initState() {
+    // TODO: implement initState
+    _initFunction();
+    super.initState();
+  }
+
+  _initFunction() async {
+    await getRelatedNewsDetails();
+    getPopularNewsDetails();
+  }
 
   double screenHeight = 0;
   double screenWidth = 0;
+  var result;
+
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
@@ -91,10 +52,11 @@ class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DhamakedarNewsScreen()));
+              // Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => DhamakedarNewsScreen()));
+              Navigator.pop(context);
             },
             icon: Icon(
               Icons.arrow_back,
@@ -178,6 +140,7 @@ class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
                   ),
                 ),
               ),
+              bannerAdWidget(),
               SizedBox(
                 height: 10,
               ),
@@ -211,99 +174,23 @@ class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
               SizedBox(
                 height: 10,
               ),
-              Column(
-                children: [
-                  SizedBox(
-                    height: 0,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => NewsDetaailsScreen(
-                      //       id: items.newsId,
-                      //       title: items.newstitle,
-                      //       image: items.newsImage,
-                      //       description: items.newsContent,
-                      //     ),
-                      //   ),
-                      // );
-                    },
-                    child: Card(
-                      child: Container(
-                        height: screenHeight / 7,
-                        width: screenWidth / 1.05,
-                        child: Column(
-                          children: [
-                            Container(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    height: screenHeight / 10,
-                                    width: screenWidth / 3,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(5)),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          "https://media.cntraveler.com/photos/60596b398f4452dac88c59f8/16:9/w_3999,h_2249,c_limit/MtFuji-GettyImages-959111140.jpg",
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: screenHeight / 8,
-                                    width: screenWidth / 1.7,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                            top: 10,
-                                          ),
-                                          child: Text(
-                                            "items.newstitle",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            maxLines: 3,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                            right: 10,
-                                            bottom: 10,
-                                          ),
-                                          alignment: Alignment.centerRight,
-                                          child: Text(
-                                            "items.newsTiming",
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+              Container(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height / 1,
+                  width: MediaQuery.of(context).size.width,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: false,
+                    // shrinkWrap: true,
+                    itemCount: popularNewsList.length,
+                    itemBuilder: (context, index) => popularNewsWidget(
+                      popularNewsList[index],
                     ),
                   ),
-                  SizedBox(
-                    height: 10,
-                  )
-                ],
+                ),
               ),
+              bannerAdWidget(),
             ],
           ),
         ],
@@ -346,7 +233,7 @@ class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
                   ),
                   image: DecorationImage(
                       image: NetworkImage(
-                        "https://www.youandthemat.com/wp-content/uploads/nature-2-26-17.jpg",
+                        items.image,
                       ),
                       fit: BoxFit.cover)),
               height: screenHeight / 9,
@@ -357,7 +244,7 @@ class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
             ),
             Container(
               child: Text(
-                "If the [style] argument is null, the text will use the style from the closest enclosing [DefaultTextStyle]",
+                items.title,
                 style: TextStyle(
                   fontSize: 12,
                 ),
@@ -373,7 +260,7 @@ class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
                 horizontal: 5,
               ),
               child: Text(
-                "7 hours ago",
+                items.timing,
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 12,
@@ -383,6 +270,141 @@ class _NewsDetaailsScreenState extends State<NewsDetaailsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget popularNewsWidget(PopularNewsModel itemss) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 0,
+        ),
+        InkWell(
+          onTap: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => NewsDetaailsScreen(
+            //       id: items.newsId,
+            //       title: items.newstitle,
+            //       image: items.newsImage,
+            //       description: items.newsContent,
+            //     ),
+            //   ),
+            // );
+          },
+          child: Card(
+            child: Container(
+              height: screenHeight / 7,
+              width: screenWidth / 1.05,
+              child: Column(
+                children: [
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: screenHeight / 10,
+                          width: screenWidth / 3,
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.only(topLeft: Radius.circular(5)),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                itemss.image,
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: screenHeight / 8,
+                          width: screenWidth / 1.7,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(
+                                  top: 10,
+                                ),
+                                child: Text(
+                                  itemss.title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 3,
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                  right: 10,
+                                  bottom: 10,
+                                ),
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  itemss.timing,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        )
+      ],
+    );
+  }
+//------------------------------Api Call
+
+  Future getRelatedNewsDetails() async {
+    var url = Settings.relatedNews;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+
+    var _cryptoList = result as List;
+    setState(() {
+      relatedNewsList.clear();
+      var listdata =
+          _cryptoList.map((e) => RelatedNewsModel.fromjson(e)).toList();
+      relatedNewsList.addAll(listdata);
+    });
+  }
+
+  Future getPopularNewsDetails() async {
+    var url = Settings.popularNews;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+
+    var _cryptoList = result as List;
+    setState(() {
+      popularNewsList.clear();
+      var listdata =
+          _cryptoList.map((e) => PopularNewsModel.fromjson(e)).toList();
+      popularNewsList.addAll(listdata);
+    });
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 }

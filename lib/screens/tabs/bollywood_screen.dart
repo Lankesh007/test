@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:asb_news/models/bollywood_details_model.dart';
-import 'package:asb_news/screens/bollywood_details_screen.dart';
+import 'package:asb_news/screens/google_ads_screen.dart';
+import 'package:asb_news/screens/samachar_screen.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class BollyWoodScreen extends StatefulWidget {
   const BollyWoodScreen({Key? key}) : super(key: key);
@@ -71,7 +73,7 @@ class _BollyWoodScreenState extends State<BollyWoodScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BollyWoodDetailsScreen(
+                          builder: (context) => SamacharScreen(
                             id: bollywoodListDetails[0].newsId,
                             title: bollywoodListDetails[0].newstitle,
                             image: bollywoodListDetails[0].newsImage,
@@ -115,22 +117,20 @@ class _BollyWoodScreenState extends State<BollyWoodScreen> {
                       )),
                     ),
                   ),
+                  bannerAdWidget(),
                   Container(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        physics: NeverScrollableScrollPhysics(),
-                        reverse: false,
-                        shrinkWrap: true,
-                        itemCount: bollywoodListDetails.length,
-                        itemBuilder: (context, index) => newsDetailsWidget(
-                          bollywoodListDetails[index],
-                        ),
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      physics: NeverScrollableScrollPhysics(),
+                      reverse: false,
+                      shrinkWrap: true,
+                      itemCount: bollywoodListDetails.length,
+                      itemBuilder: (context, index) => newsDetailsWidget(
+                        bollywoodListDetails[index],
                       ),
                     ),
                   ),
+                  bannerAdWidget()
                 ],
               ),
             ),
@@ -140,6 +140,18 @@ class _BollyWoodScreenState extends State<BollyWoodScreen> {
   Widget newWidget(BollyWoodDetailsModel item) {
     return Container(
       child: Text(item.newsId),
+    );
+  }
+
+  Widget bannerAdWidget() {
+    return Container(
+      child: AdWidget(
+        ad: AdMobService.createBannerAd()..load(),
+        key: UniqueKey(),
+      ),
+      width: screenWidth,
+      height: 270.0,
+      alignment: Alignment.center,
     );
   }
 
@@ -158,7 +170,7 @@ class _BollyWoodScreenState extends State<BollyWoodScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BollyWoodDetailsScreen(
+                      builder: (context) => SamacharScreen(
                         id: items.newsId,
                         title: items.newstitle,
                         image: items.newsImage,

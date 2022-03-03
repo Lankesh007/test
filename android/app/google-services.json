@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "663082140605",
+    "project_id": "asb-news-india",
+    "storage_bucket": "asb-news-india.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663082140605:android:65a9e3cba352eb00ef88d4",
+        "android_client_info": {
+          "package_name": "com.asbnewsindia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "663082140605-pbho0qem8nlcdv1r92hss3fo7camkso5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhmhQpni7okRWwG3KWOjVI9Dp1LJR-1Lc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663082140605-pbho0qem8nlcdv1r92hss3fo7camkso5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "663082140605-d8d3qdppd333ceh0d0m6ut6gijg20d71.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.asbnewsindia"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
