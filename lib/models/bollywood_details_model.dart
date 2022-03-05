@@ -5,6 +5,7 @@ class BollyWoodDetailsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   BollyWoodDetailsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class BollyWoodDetailsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory BollyWoodDetailsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class BollyWoodDetailsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -35,6 +38,7 @@ class BollyWoodDetailsModel {
     bollywoodListDetails['content']['rendered'] = this.newsContent;
     bollywoodListDetails['featured_image'] = this.newsImage;
     bollywoodListDetails["content"]["rendered"] = this.newsDiscription;
+    bollywoodListDetails["link"] = this.imageUrl;
 
     return bollywoodListDetails;
   }

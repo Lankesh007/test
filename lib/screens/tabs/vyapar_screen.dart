@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:asb_news/models/bollywood_details_model.dart';
 import 'package:asb_news/models/vyapar_details_model.dart';
 import 'package:asb_news/screens/google_ads_screen.dart';
@@ -8,6 +9,7 @@ import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VyaparScreen extends StatefulWidget {
   const VyaparScreen({Key? key}) : super(key: key);
@@ -32,9 +34,56 @@ class _VyaparScreenState extends State<VyaparScreen> {
     });
   }
 
+  // void initState() {
+  //   getBollywoodDetails();
+  //   super.initState();
+  // }
+  TextEditingController searchController = TextEditingController();
+  ScrollController scrollController = ScrollController();
+  FocusNode searchFocus = FocusNode();
+  late SharedPreferences _preferences;
+  bool isSearch = false;
+  bool isSearchTap = false;
+  bool isProduct = false;
+  bool isSubscribePro = false;
+  bool isLogin = false;
+  bool _hasNext = true;
+  bool isLoadMore = false;
+  bool isLoadfirst = false;
+  ScrollController _scrollController = ScrollController();
+  String userId = '';
+  int page = 1;
+
+  @override
   void initState() {
     getBollywoodDetails();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      initPref();
+    });
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        setState(() {
+          page++;
+          _hasNext = true;
+          isLoadMore = true;
+        });
+        getScrollingDetails(page.toString());
+      } /*  else if (_scrollController.position.pixels ==
+          _scrollController.position.minScrollExtent) {
+        setState(() {
+          if (page > 0) {
+            page--;
+            isLoadfirst = true;
+            getScrollingDetails(page.toString());
+          }
+        });
+      } */
+      log('=================>>>' + page.toString());
+    });
+
     super.initState();
+    // initPref();
   }
 
   var result;
@@ -67,6 +116,9 @@ class _VyaparScreenState extends State<VyaparScreen> {
           : Container(
               height: screenHeight,
               child: ListView(
+                controller: _scrollController,
+                shrinkWrap: true,
+                physics: BouncingScrollPhysics(),
                 children: [
                   InkWell(
                     onTap: () {
@@ -78,6 +130,7 @@ class _VyaparScreenState extends State<VyaparScreen> {
                             title: vyaparDetailsList[0].newstitle,
                             image: vyaparDetailsList[0].newsImage,
                             description: vyaparDetailsList[0].newsContent,
+                            imageUrl: vyaparDetailsList[0].imageUrl,
                           ),
                         ),
                       );
@@ -153,88 +206,93 @@ class _VyaparScreenState extends State<VyaparScreen> {
             ? Container(
                 height: 100,
               )
-            : InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SamacharScreen(
-                        id: items.newsId,
-                        title: items.newstitle,
-                        image: items.newsImage,
-                        description: items.newsContent,
-                      ),
-                    ),
-                  );
-                },
-                child: Card(
-                  child: Container(
-                    height: screenHeight / 7.6,
-                    width: screenWidth / 1.05,
-                    child: Column(
-                      children: [
-                        Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                height: screenHeight / 10,
-                                width: screenWidth / 3,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(5)),
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                      items.newsImage,
-                                    ),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: screenHeight / 8,
-                                width: screenWidth / 1.7,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                        top: 10,
-                                      ),
-                                      child: Text(
-                                        items.newstitle,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 3,
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                        right: 10,
-                                        // bottom: 10,
-                                      ),
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        items.newsTiming,
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
+            : items.newsId == vyaparDetailsList[0].newsId
+                ? Container()
+                : InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SamacharScreen(
+                            id: items.newsId,
+                            title: items.newstitle,
+                            image: items.newsImage,
+                            description: items.newsContent,
+                            imageUrl: items.imageUrl,
                           ),
                         ),
-                      ],
+                      );
+                    },
+                    child: Card(
+                      child: Container(
+                        height: screenHeight / 7.6,
+                        width: screenWidth / 1.05,
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    height: screenHeight / 10,
+                                    width: screenWidth / 3,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(5)),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                          items.newsImage,
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: screenHeight / 8,
+                                    width: screenWidth / 1.7,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            top: 10,
+                                          ),
+                                          child: Text(
+                                            items.newstitle,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                            maxLines: 3,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            right: 10,
+                                            // bottom: 10,
+                                          ),
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            items.newsTiming,
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
       ],
     );
   }
@@ -249,5 +307,33 @@ class _VyaparScreenState extends State<VyaparScreen> {
       height: 270.0,
       alignment: Alignment.center,
     );
+  }
+
+  Future getScrollingDetails(page) async {
+    var url = Settings.scrollingData + page;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+
+    var _cryptoList = result as List;
+    setState(() {
+      // deshDetailsList.clear();
+      var listdata =
+          _cryptoList.map((e) => VyaparDetailsModel.fromjson(e)).toList();
+      vyaparDetailsList.addAll(listdata);
+    });
+  }
+
+  initPref() async {
+    _preferences = await SharedPreferences.getInstance();
+
+    log(userId);
+
+    // getScrollingDetails(page.toString());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

@@ -5,6 +5,7 @@ class GaramMasalaModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   GaramMasalaModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class GaramMasalaModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory GaramMasalaModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class GaramMasalaModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -34,6 +37,7 @@ class GaramMasalaModel {
     garamMaslaList['content']['rendered'] = this.newsContent;
     garamMaslaList['featured_image'] = this.newsImage;
     garamMaslaList["content"]["rendered"] = this.newsDiscription;
+    garamMaslaList["link"] = this.imageUrl;
 
     return garamMaslaList;
   }

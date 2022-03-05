@@ -5,6 +5,7 @@ class DefaultNewsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   DefaultNewsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class DefaultNewsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory DefaultNewsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class DefaultNewsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -34,6 +37,7 @@ class DefaultNewsModel {
     defaultNews['content']['rendered'] = this.newsContent;
     defaultNews['featured_image'] = this.newsImage;
     defaultNews["content"]["rendered"] = this.newsDiscription;
+    defaultNews["link"] = this.imageUrl;
 
     return defaultNews;
   }

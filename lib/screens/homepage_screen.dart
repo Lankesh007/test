@@ -18,6 +18,7 @@ import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:new_version/new_version.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePageScreen extends StatefulWidget {
   final List districtIdList;
@@ -32,6 +33,7 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
+  SharedPreferences? _preferences;
   List<TabBarDetailsModel> tabBarDetails = [];
 
   Future getTabBarDetails() async {

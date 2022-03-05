@@ -247,6 +247,7 @@ class _RelatedNewsScreenState extends State<RelatedNewsScreen> {
                       title: items.title,
                       image: items.image,
                       description: items.description,
+                      imageUrl: items.imageUrl,
                     )));
       },
       child: Container(
@@ -324,6 +325,7 @@ class _RelatedNewsScreenState extends State<RelatedNewsScreen> {
                   title: itemss.title,
                   image: itemss.image,
                   description: itemss.description,
+                  imageUrl: itemss.imageUrl,
                 ),
               ),
             );

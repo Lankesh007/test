@@ -5,6 +5,7 @@ class HealthyDetailsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   HealthyDetailsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class HealthyDetailsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory HealthyDetailsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class HealthyDetailsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -34,6 +37,7 @@ class HealthyDetailsModel {
     healthyList['content']['rendered'] = this.newsContent;
     healthyList['featured_image'] = this.newsImage;
     healthyList["content"]["rendered"] = this.newsDiscription;
+    healthyList["link"] = this.imageUrl;
 
     return healthyList;
   }

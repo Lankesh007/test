@@ -32,5 +32,10 @@ class Settings {
   static String garamMasalaNews =
       BASE_URL + "wp-json/wp/v2/posts?categories=449";
 
+  static String selectStateNews = BASE_URL + "wp-json/wp/v2/posts?categories=";
+
+  static String scrollingData =
+      BASE_URL + "wp-json/wp/v2/posts?categories=23&page=";
+
   static var apiKey = "7c4a8d09ca3762af61e59520943dc26494f8941b";
 }

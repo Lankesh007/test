@@ -5,6 +5,7 @@ class VyaparDetailsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   VyaparDetailsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class VyaparDetailsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory VyaparDetailsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class VyaparDetailsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -34,6 +37,7 @@ class VyaparDetailsModel {
     vyaparDetailsList['content']['rendered'] = this.newsContent;
     vyaparDetailsList['featured_image'] = this.newsImage;
     vyaparDetailsList["content"]["rendered"] = this.newsDiscription;
+    vyaparDetailsList["link"] = this.imageUrl;
 
     return vyaparDetailsList;
   }

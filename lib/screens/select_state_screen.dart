@@ -1,12 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:convert';
+import 'dart:developer';
 import 'package:asb_news/models/select_state_model.dart';
-import 'package:asb_news/screens/homepage_screen.dart';
 import 'package:asb_news/screens/select_district_screen.dart';
 import 'package:asb_news/utils/api.dart';
+import 'package:asb_news/utils/constantKey.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectStateScreen extends StatefulWidget {
   const SelectStateScreen({Key? key}) : super(key: key);
@@ -19,6 +21,10 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
   List<SelectStateModel> stateCategory = [];
   double screenHeight = 0;
   double screenWidth = 0;
+  SharedPreferences? _preferences;
+  Future getStatedata() async {
+    _preferences = await SharedPreferences.getInstance();
+  }
 
   Future getStateCategory() async {
     var url = Settings.seelctStateCategory;
@@ -40,6 +46,7 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
   void initState() {
     getStateCategory();
     super.initState();
+    getStatedata();
   }
 
   @override
@@ -86,12 +93,19 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
           height: 10,
         ),
         InkWell(
-          onTap: () {
+          onTap: () async {
+            _preferences = await SharedPreferences.getInstance();
+            _preferences!.setString(stateId, item.stateId);
+            _preferences!.setString(stateName, item.stateName);
+            log('===>>  ${_preferences!.getString(stateName)}');
+            // log('===>>  ${item.stateId}');
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    SelectDistrictScreen(stateId: item.stateId),
+                builder: (context) => SelectDistrictScreen(
+                  stateId: item.stateId,
+                  stateName: item.stateName,
+                ),
               ),
             );
           },

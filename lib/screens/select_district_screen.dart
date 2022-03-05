@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:asb_news/models/select_district_model.dart';
 import 'package:asb_news/screens/homepage_screen.dart';
-import 'package:asb_news/screens/shared_prefrences.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/constantKey.dart';
@@ -12,8 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectDistrictScreen extends StatefulWidget {
   final stateId;
+  final stateName;
 
-  const SelectDistrictScreen({required this.stateId, Key? key})
+  const SelectDistrictScreen(
+      {required this.stateId, required this.stateName, Key? key})
       : super(key: key);
 
   @override
@@ -41,6 +41,7 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
   List<SelectDistrictModel> districtCategory = [];
   List<String> districtNameList = [];
   List<String> districtIdList = [];
+
   double screenHeight = 0;
   double screenWidth = 0;
 
@@ -174,27 +175,6 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
                             ),
                           ),
                         );
-                        // return Container(
-                        //   margin:
-                        //       EdgeInsets.only(bottom: 10, left: 10, right: 10),
-                        //   child: Container(
-                        //     child: CheckboxListTile(
-                        //       onChanged: (val) {
-                        //         setState(() {
-                        //           valuefirst = [i].toString();
-                        //           districtCategory[i].districtId;
-                        //           disId = districtCategory[i].districtId;
-                        //           distName = districtCategory[i].districtName;
-                        //         });
-                        //       },
-                        //       value:
-                        //           valuefirst == [i].toString() ? true : false,
-                        //       title: Text(
-                        //         districtCategory[i].districtName,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // );
                       }),
                 ),
               ],
@@ -224,6 +204,7 @@ class _SelectDistrictScreenState extends State<SelectDistrictScreen> {
             if (districtIdList.length > 0) {
               _preferences?.setStringList('$distIdList', districtIdList);
               _preferences?.setStringList('$distTitleList', districtNameList);
+
               _preferences?.setBool('$selected', true);
               Navigator.push(
                   context,

@@ -5,6 +5,7 @@ class TechnologyDetailsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   TechnologyDetailsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class TechnologyDetailsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory TechnologyDetailsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class TechnologyDetailsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -34,6 +37,8 @@ class TechnologyDetailsModel {
     technologyList['content']['rendered'] = this.newsContent;
     technologyList['featured_image'] = this.newsImage;
     technologyList["content"]["rendered"] = this.newsDiscription;
+    technologyList["link"] = this.imageUrl;
+
     return technologyList;
   }
 }

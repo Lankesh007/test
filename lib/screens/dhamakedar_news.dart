@@ -6,12 +6,15 @@ import 'package:asb_news/models/healthy_details_model.dart';
 import 'package:asb_news/models/technology_details_model.dart';
 import 'package:asb_news/models/vyapar_details_model.dart';
 import 'package:asb_news/screens/google_ads_screen.dart';
+import 'package:asb_news/screens/homepage_screen.dart';
 import 'package:asb_news/screens/samachar_screen.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
+import 'package:asb_news/utils/constantKey.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DhamakedarNewsScreen extends StatefulWidget {
   const DhamakedarNewsScreen({Key? key}) : super(key: key);
@@ -27,7 +30,17 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
     getHealthNews();
     getbusinessNews();
     getadhyatmDetailsNews();
+    saveData();
     super.initState();
+  }
+
+  SharedPreferences? _preferences;
+
+  saveData() async {
+    _preferences = await SharedPreferences.getInstance();
+
+    idList = _preferences!.getStringList('$distIdList')!;
+    titleList = _preferences!.getStringList('$distTitleList')!;
   }
 
   List<GaramMasalaModel> garamMaslaList = [];
@@ -35,6 +48,8 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
   List<HealthyDetailsModel> healthyList = [];
   List<VyaparDetailsModel> vyaparDetailsList = [];
   List<AdhyatmicDetailsModel> adhyatmicDetailsList = [];
+  List<String?> idList = [];
+  List<String?> titleList = [];
   double screenHeight = 0;
   double screenWidth = 0;
   @override
@@ -56,13 +71,13 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
         centerTitle: true,
         leading: IconButton(
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) =>
-              // HomePageScreen(districtIdList: , districtNameList: )
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomePageScreen(
+                      districtIdList: idList, districtNameList: titleList),
+                ),
+              );
             },
             icon: Icon(
               Icons.arrow_back,
@@ -320,6 +335,7 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                   title: items.newstitle,
                   image: items.newsImage,
                   description: items.newsContent,
+                  imageUrl: items.imageUrl,
                 ),
               ),
             );
@@ -410,6 +426,7 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                   title: items.newstitle,
                   image: items.newsImage,
                   description: items.newsContent,
+                  imageUrl: items.imageUrl,
                 ),
               ),
             );
@@ -500,6 +517,7 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                   title: items.newstitle,
                   image: items.newsImage,
                   description: items.newsContent,
+                  imageUrl: items.imageUrl,
                 ),
               ),
             );
@@ -590,6 +608,7 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                   title: items.newstitle,
                   image: items.newsImage,
                   description: items.newsContent,
+                  imageUrl: items.imageUrl,
                 ),
               ),
             );
@@ -680,6 +699,7 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                   title: items.newstitle,
                   image: items.newsImage,
                   description: items.newsContent,
+                  imageUrl: items.imageUrl,
                 ),
               ),
             );

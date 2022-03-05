@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:asb_news/models/news_by_select_district_model.dart';
 import 'package:asb_news/models/select_district_model.dart';
 import 'package:asb_news/models/select_state_model.dart';
+import 'package:asb_news/models/state_news_model.dart';
 import 'package:asb_news/models/uttarpradesh_details_model.dart';
 import 'package:asb_news/screens/google_ads_screen.dart';
 import 'package:asb_news/screens/samachar_screen.dart';
@@ -11,6 +13,7 @@ import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UttarPradeshScreen extends StatefulWidget {
   const UttarPradeshScreen({Key? key}) : super(key: key);
@@ -22,15 +25,64 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
   List<UttarPradeshDetailsModel> uttarPradeshList = [];
   List<SelectStateModel> stateCategory = [];
   List<SelectDistrictModel> districtCategory = [];
-
+  List<StateNewsModel> stateNewsList = [];
   List<NewsBySelectDistrict> districtNewsList = [];
 
+  TextEditingController searchController = TextEditingController();
+  ScrollController scrollController = ScrollController();
+  FocusNode searchFocus = FocusNode();
+  late SharedPreferences _preferences;
+  bool isSearch = false;
+  bool isSearchTap = false;
+  bool isProduct = false;
+  bool isSubscribePro = false;
+  bool isLogin = false;
+  bool _hasNext = true;
+  bool isLoadMore = false;
+  bool isLoadfirst = false;
+  ScrollController _scrollController = ScrollController();
+  String userId = '';
+  int page = 1;
+
+  @override
   void initState() {
+    _initFunction();
+
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      _initFunction();
+      initPref();
     });
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        setState(() {
+          page++;
+          _hasNext = true;
+          isLoadMore = true;
+        });
+        getScrollingDetails(page.toString());
+      } /*  else if (_scrollController.position.pixels ==
+          _scrollController.position.minScrollExtent) {
+        setState(() {
+          if (page > 0) {
+            page--;
+            isLoadfirst = true;
+            getScrollingDetails(page.toString());
+          }
+        });
+      } */
+      log('=================>>>' + page.toString());
+    });
+
     super.initState();
+    // initPref();
   }
+
+  // void initState() {
+  //   WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+  //     _initFunction();
+  //   });
+  //   super.initState();
+  // }
 
   _initFunction() async {
     getUttarPradeshDetails();
@@ -52,6 +104,7 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
   bool isData = true;
   var sId;
   var disId;
+  bool selectState = false;
 
   @override
   @override
@@ -79,6 +132,9 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
               ],
             )
           : ListView(
+              controller: _scrollController,
+              shrinkWrap: true,
+              physics: BouncingScrollPhysics(),
               children: [
                 SizedBox(
                   height: 10,
@@ -151,76 +207,92 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
                                 ),
                         ],
                       )
-                    : Column(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      UttarPradeshDetailsScreen(
-                                    id: uttarPradeshList[0].newsId,
-                                    title: uttarPradeshList[0].newstitle,
-                                    image: uttarPradeshList[0].newsImage,
-                                    description:
-                                        uttarPradeshList[0].newsContent,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              height: screenHeight / 2.7,
-                              child: Card(
-                                  child: Column(
-                                children: [
-                                  Container(
-                                    child: Image.network(
-                                      uttarPradeshList[0].newsImage,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    uttarPradeshList[0].newstitle,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.bottomRight,
-                                    child: Text(
-                                      uttarPradeshList[0].newsTiming,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )),
-                            ),
-                          ),
-                          bannerAdWidget(),
-                          Container(
+                    : selectState == true
+                        ? Container(
+                            height: screenHeight / 1.4,
+                            width: screenWidth,
                             child: ListView.builder(
                               scrollDirection: Axis.vertical,
-                              physics: NeverScrollableScrollPhysics(),
-                              reverse: false,
-                              shrinkWrap: true,
-                              itemCount: uttarPradeshList.length,
+                              // physics: NeverScrollableScrollPhysics(),
+                              // reverse: false,
+                              // shrinkWrap: true,
+                              itemCount: stateNewsList.length,
                               itemBuilder: (context, index) =>
-                                  newsDetailsWidget(
-                                uttarPradeshList[index],
+                                  stateDetailsWidget(
+                                stateNewsList[index],
                               ),
                             ),
+                          )
+                        : Column(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          UttarPradeshDetailsScreen(
+                                        id: uttarPradeshList[0].newsId,
+                                        title: uttarPradeshList[0].newstitle,
+                                        image: uttarPradeshList[0].newsImage,
+                                        description:
+                                            uttarPradeshList[0].newsContent,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  height: screenHeight / 2.7,
+                                  child: Card(
+                                      child: Column(
+                                    children: [
+                                      Container(
+                                        child: Image.network(
+                                          uttarPradeshList[0].newsImage,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        uttarPradeshList[0].newstitle,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Container(
+                                        alignment: Alignment.bottomRight,
+                                        child: Text(
+                                          uttarPradeshList[0].newsTiming,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+                                ),
+                              ),
+                              bannerAdWidget(),
+                              Container(
+                                child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  reverse: false,
+                                  shrinkWrap: true,
+                                  itemCount: uttarPradeshList.length,
+                                  itemBuilder: (context, index) =>
+                                      newsDetailsWidget(
+                                    uttarPradeshList[index],
+                                  ),
+                                ),
+                              ),
+                              bannerAdWidget()
+                            ],
                           ),
-                          bannerAdWidget()
-                        ],
-                      ),
               ],
             ),
     );
@@ -254,88 +326,93 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
             ? Container(
                 height: 100,
               )
-            : InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SamacharScreen(
-                        id: items.newsId,
-                        title: items.newstitle,
-                        image: items.newsImage,
-                        description: items.newsContent,
-                      ),
-                    ),
-                  );
-                },
-                child: Card(
-                  child: Container(
-                    height: screenHeight / 7.6,
-                    width: screenWidth / 1.05,
-                    child: Column(
-                      children: [
-                        Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                height: screenHeight / 10,
-                                width: screenWidth / 3,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(5)),
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                      items.newsImage,
-                                    ),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: screenHeight / 8,
-                                width: screenWidth / 1.7,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                        top: 10,
-                                      ),
-                                      child: Text(
-                                        items.newstitle,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 3,
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                        right: 10,
-                                        // bottom: 10,
-                                      ),
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        items.newsTiming,
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
+            : items.newsId == uttarPradeshList[index].newsId
+                ? Container()
+                : InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SamacharScreen(
+                            id: items.newsId,
+                            title: items.newstitle,
+                            image: items.newsImage,
+                            description: items.newsContent,
+                            imageUrl: items.imageUrl,
                           ),
                         ),
-                      ],
+                      );
+                    },
+                    child: Card(
+                      child: Container(
+                        height: screenHeight / 7.6,
+                        width: screenWidth / 1.05,
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    height: screenHeight / 10,
+                                    width: screenWidth / 3,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(5)),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                          items.newsImage,
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: screenHeight / 8,
+                                    width: screenWidth / 1.7,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            top: 10,
+                                          ),
+                                          child: Text(
+                                            items.newstitle,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                            maxLines: 3,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            right: 10,
+                                            // bottom: 10,
+                                          ),
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            items.newsTiming,
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
       ],
     );
   }
@@ -346,8 +423,10 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
       children: [
         InkWell(
           onTap: () {
+            selectState = true;
             setState(() {
               sId = itemss.stateId;
+              getSelectedStateNews(itemss.stateId);
             });
             getDistrictCategory(itemss.stateId);
           },
@@ -386,6 +465,7 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
               disId = itemsss.districtId;
             });
             getNewsBySelectDistrict(itemsss.districtId);
+
             // if (districtId == distId) {
             //   isSelectd = true;
             // }
@@ -428,6 +508,92 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
                   title: item.newstitle,
                   image: item.newsImage,
                   description: item.newsContent,
+                  imageUrl: item.imageUrl,
+                ),
+              ),
+            );
+            getNewsBySelectDistrict(item.newsId);
+          },
+          child: Card(
+            child: Container(
+              height: screenHeight / 7,
+              width: screenWidth / 1.1,
+              child: Column(
+                children: [
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: screenHeight / 10,
+                          width: screenWidth / 3.6,
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.only(topLeft: Radius.circular(5)),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                item.newsImage,
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: screenWidth / 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                child: Text(
+                                  item.newstitle,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 4,
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                  top: 5,
+                                  right: 5,
+                                ),
+                                child: Text(
+                                  item.newsTiming,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget stateDetailsWidget(StateNewsModel item) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SamacharScreen(
+                  id: item.newsId,
+                  title: item.newstitle,
+                  image: item.newsImage,
+                  description: item.newsContent,
+                  imageUrl: item.imageUrl,
                 ),
               ),
             );
@@ -514,6 +680,19 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
     });
   }
 
+  Future getSelectedStateNews(String sId) async {
+    var url = Settings.selectStateNews + sId.toString();
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+    var _cryptoList = result as List;
+    setState(() {
+      stateNewsList.clear();
+      var listdata =
+          _cryptoList.map((e) => StateNewsModel.fromjson(e)).toList();
+      stateNewsList.addAll(listdata);
+    });
+  }
+
   Future getStateCategory() async {
     var url = Settings.seelctStateCategory;
     var res = await GlobalFunction.apiGetRequestae(url);
@@ -570,5 +749,33 @@ class _UttarPradeshScreenState extends State<UttarPradeshScreen> {
         isData = false;
       }
     });
+  }
+
+  Future getScrollingDetails(page) async {
+    var url = Settings.scrollingData + page;
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+
+    var _cryptoList = result as List;
+    setState(() {
+      // deshDetailsList.clear();
+      var listdata =
+          _cryptoList.map((e) => UttarPradeshDetailsModel.fromjson(e)).toList();
+      uttarPradeshList.addAll(listdata);
+    });
+  }
+
+  initPref() async {
+    _preferences = await SharedPreferences.getInstance();
+
+    log(userId);
+
+    // getScrollingDetails(page.toString());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

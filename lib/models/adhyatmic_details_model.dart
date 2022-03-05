@@ -5,6 +5,7 @@ class AdhyatmicDetailsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   AdhyatmicDetailsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class AdhyatmicDetailsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory AdhyatmicDetailsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class AdhyatmicDetailsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -35,6 +38,7 @@ class AdhyatmicDetailsModel {
     adhyatmicDetailsList['content']['rendered'] = this.newsContent;
     adhyatmicDetailsList['featured_image'] = this.newsImage;
     adhyatmicDetailsList["content"]["rendered"] = this.newsDiscription;
+    adhyatmicDetailsList["link"] = this.imageUrl;
 
     return adhyatmicDetailsList;
   }

@@ -1,4 +1,4 @@
-class DuniaDetailsModel {
+class StateNewsModel {
   String newsId = "";
   String newsTiming = "";
   String newstitle = "";
@@ -7,7 +7,7 @@ class DuniaDetailsModel {
   String newsDiscription = "";
   String imageUrl = "";
 
-  DuniaDetailsModel({
+  StateNewsModel({
     required this.newsId,
     required this.newsTiming,
     required this.newstitle,
@@ -17,8 +17,8 @@ class DuniaDetailsModel {
     required this.imageUrl,
   });
 
-  factory DuniaDetailsModel.fromjson(Map<String, dynamic> json) {
-    return DuniaDetailsModel(
+  factory StateNewsModel.fromjson(Map<String, dynamic> json) {
+    return StateNewsModel(
       newsId: json["id"].toString(),
       newsTiming: json["modified"].toString(),
       newstitle: json["title"]["rendered"].toString(),
@@ -29,16 +29,16 @@ class DuniaDetailsModel {
     );
   }
   Map<String, dynamic> tojson() {
-    final Map<String, dynamic> duniaDetailsList = new Map<String, dynamic>();
+    final Map<String, dynamic> stateNewsList = new Map<String, dynamic>();
 
-    duniaDetailsList['id'] = this.newsId;
-    duniaDetailsList['modified'] = this.newsTiming;
-    duniaDetailsList['title']['rendered'] = this.newstitle;
-    duniaDetailsList['content']['rendered'] = this.newsContent;
-    duniaDetailsList['featured_image'] = this.newsImage;
-    duniaDetailsList["content"]["rendered"] = this.newsDiscription;
-    duniaDetailsList["link"] = this.imageUrl;
+    stateNewsList['id'] = this.newsId;
+    stateNewsList['modified'] = this.newsTiming;
+    stateNewsList['title']['rendered'] = this.newstitle;
+    stateNewsList['content']['rendered'] = this.newsContent;
+    stateNewsList['featured_image'] = this.newsImage;
+    stateNewsList["content"]["rendered"] = this.newsDiscription;
+    stateNewsList["link"] = this.imageUrl;
 
-    return duniaDetailsList;
+    return stateNewsList;
   }
 }

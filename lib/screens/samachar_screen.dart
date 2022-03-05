@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:developer';
+import 'dart:io';
 import 'package:asb_news/models/bollywood_details_model.dart';
 import 'package:asb_news/models/dunia_details_model.dart';
 import 'package:asb_news/models/khel_model.dart';
@@ -9,23 +10,31 @@ import 'package:asb_news/screens/dhamakedar_news.dart';
 import 'package:asb_news/screens/google_ads_screen.dart';
 import 'package:asb_news/screens/popular_news_screen.dart';
 import 'package:asb_news/screens/related_news_screen.dart';
+import 'package:asb_news/screens/tabs/home_screen.dart';
+import 'package:asb_news/utils/adHelper.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 class SamacharScreen extends StatefulWidget {
   final id;
   final title;
   final image;
   final description;
+  final imageUrl;
   const SamacharScreen({
     required this.id,
     required this.title,
     required this.image,
     required this.description,
+    required this.imageUrl,
     Key? key,
   }) : super(key: key);
 
@@ -34,6 +43,57 @@ class SamacharScreen extends StatefulWidget {
 }
 
 class _SamacharScreenState extends State<SamacharScreen> {
+  late InterstitialAd myInterstitialAd;
+
+  void dispose() {
+    _interstitialAd?.dispose();
+
+    super.dispose();
+  }
+
+  Future<InitializationStatus> _initGoogleMobileAds() {
+    return MobileAds.instance.initialize();
+  }
+
+  InterstitialAd? _interstitialAd;
+
+  bool _isInterstitialAdReady = false;
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          this._interstitialAd = ad;
+
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              HomeScreen(
+                districtIdList: [],
+                districtNameList: [],
+              );
+            },
+          );
+
+          _isInterstitialAdReady = true;
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load an interstitial ad: ${err.message}');
+          _isInterstitialAdReady = false;
+        },
+      ),
+    );
+  }
+
+  void onNewLevel(int level, drawing, String clue) {
+    if (level >= 3 && !_isInterstitialAdReady) {
+      _loadInterstitialAd();
+    }
+  }
+
+  late String _url = "";
+
   double screenHeight = 0;
   var result;
   List<RelatedNewsModel> relatedNewsList = [];
@@ -42,11 +102,14 @@ class _SamacharScreenState extends State<SamacharScreen> {
   List<KhelDetailsModel> khelDetailsList = [];
   List<DuniaDetailsModel> duniaDetailsList = [];
   double screenWidth = 0;
+  String playStoreUrl =
+      "https://play.google.com/store/apps/details?id=com.asbnewsindia";
 
   @override
   void initState() {
     // TODO: implement initState
     _initFunction();
+    MobileAds.instance.initialize();
 
     super.initState();
   }
@@ -57,300 +120,340 @@ class _SamacharScreenState extends State<SamacharScreen> {
     getBollyWoodNews();
     getKhelDetails();
     getDuniaDetails();
+    _loadInterstitialAd();
+    _initGoogleMobileAds();
+    _url = widget.imageUrl.toString();
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: themeColor,
-        title: Text(
-          "समाचार",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DhamakedarNewsScreen()));
-              // Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back,
+    return WillPopScope(
+      onWillPop: () async {
+        _interstitialAd?.show();
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => DhamakedarNewsScreen()));
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: themeColor,
+          title: Text(
+            "समाचार",
+            style: TextStyle(
               color: Colors.white,
-            )),
-        centerTitle: true,
-      ),
-      body: widget.id == null
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  child: islodaing,
-                ),
-              ],
-            )
-          : ListView(
-              children: [
-                Column(
-                  children: [
-                    newsHeadlineWidget(),
-                    Container(
-                      height: screenHeight / 4,
-                      width: screenWidth / 1.05,
-                      child: Image.network(
-                        widget.image,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Html(
-                      data: widget.description,
-                    ),
-                    bannerAdWidget(),
-                    Container(
-                      height: screenHeight / 3,
-                      width: screenWidth / 1.01,
-                      child: Card(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: screenHeight / 22,
-                              width: screenWidth / 4,
-                              decoration: BoxDecoration(
-                                color: themeColor,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(
-                                    5,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                "Related News",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              child: SizedBox(
-                                height: MediaQuery.of(context).size.height / 4,
-                                width: MediaQuery.of(context).size.width,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  // physics: NeverScrollableScrollPhysics(),
-                                  reverse: false,
-                                  // shrinkWrap: true,
-                                  itemCount: relatedNewsList.length,
-                                  itemBuilder: (context, index) =>
-                                      relatedNewsWidget(
-                                    relatedNewsList[index],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    bannerAdWidget(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: screenHeight / 22,
-                        width: screenWidth / 4,
-                        decoration: BoxDecoration(
-                          color: themeColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(
-                              5,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          "Popular News",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height / 1,
-                        width: MediaQuery.of(context).size.width,
-                        child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          physics: NeverScrollableScrollPhysics(),
-                          reverse: false,
-                          // shrinkWrap: true,
-                          itemCount: popularNewsList.length,
-                          itemBuilder: (context, index) => popularNewsWidget(
-                            popularNewsList[index],
-                          ),
-                        ),
-                      ),
-                    ),
-                    bannerAdWidget(),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: screenHeight / 22,
-                        width: screenWidth / 4,
-                        decoration: BoxDecoration(
-                          color: themeColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(
-                              5,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          "बॉलीवुड",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height / 1,
-                        width: MediaQuery.of(context).size.width,
-                        child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          physics: NeverScrollableScrollPhysics(),
-                          reverse: false,
-                          // shrinkWrap: true,
-                          itemCount: bollywoodListDetails.length,
-                          itemBuilder: (context, index) => bollywoodWidget(
-                            bollywoodListDetails[index],
-                          ),
-                        ),
-                      ),
-                    ),
-                    bannerAdWidget(),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: screenHeight / 22,
-                        width: screenWidth / 4,
-                        decoration: BoxDecoration(
-                          color: themeColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(
-                              5,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          "खेल",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height / 1,
-                        width: MediaQuery.of(context).size.width,
-                        child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          physics: NeverScrollableScrollPhysics(),
-                          reverse: false,
-                          // shrinkWrap: true,
-                          itemCount: khelDetailsList.length,
-                          itemBuilder: (context, index) => khelWidget(
-                            khelDetailsList[index],
-                          ),
-                        ),
-                      ),
-                    ),
-                    bannerAdWidget(),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: screenHeight / 22,
-                        width: screenWidth / 4,
-                        decoration: BoxDecoration(
-                          color: themeColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(
-                              5,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          "दुनिया",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height / 1,
-                        width: MediaQuery.of(context).size.width,
-                        child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          physics: NeverScrollableScrollPhysics(),
-                          reverse: false,
-                          // shrinkWrap: true,
-                          itemCount: duniaDetailsList.length,
-                          itemBuilder: (context, index) => duniaWidget(
-                            duniaDetailsList[index],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                bannerAdWidget(),
-              ],
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
+          ),
+          leading: IconButton(
+              onPressed: () {
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => DhamakedarNewsScreen()));
+                // Navigator.pop(context);
+
+                if (_isInterstitialAdReady) {
+                  _interstitialAd?.show();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DhamakedarNewsScreen()));
+                  Navigator.pop(context);
+                }
+                // } else {
+                //   Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //           builder: (context) => DhamakedarNewsScreen()));
+                //   Navigator.pop(context);
+                // }
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
+          centerTitle: true,
+        ),
+        body: widget.id == null
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    child: islodaing,
+                  ),
+                ],
+              )
+            : ListView(
+                children: [
+                  Column(
+                    children: [
+                      newsHeadlineWidget(),
+                      Container(
+                        height: screenHeight / 4,
+                        width: screenWidth / 1.05,
+                        child: Image.network(
+                          widget.image,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      shareWidget(),
+                      Html(
+                        data: widget.description,
+                        style: {
+                          widget.description: Style(
+                            fontSize: FontSize.larger,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        },
+                      ),
+                      bannerAdWidget(),
+                      Container(
+                        height: screenHeight / 3,
+                        width: screenWidth / 1.01,
+                        child: Card(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                height: screenHeight / 22,
+                                width: screenWidth / 4,
+                                decoration: BoxDecoration(
+                                  color: themeColor,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(
+                                      5,
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  "Related News",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                child: SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 4,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    // physics: NeverScrollableScrollPhysics(),
+                                    reverse: false,
+                                    // shrinkWrap: true,
+                                    itemCount: relatedNewsList.length,
+                                    itemBuilder: (context, index) =>
+                                        relatedNewsWidget(
+                                      relatedNewsList[index],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      bannerAdWidget(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: screenHeight / 22,
+                          width: screenWidth / 4,
+                          decoration: BoxDecoration(
+                            color: themeColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(
+                                5,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            "Popular News",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height / 1,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            physics: NeverScrollableScrollPhysics(),
+                            reverse: false,
+                            // shrinkWrap: true,
+                            itemCount: popularNewsList.length,
+                            itemBuilder: (context, index) => popularNewsWidget(
+                              popularNewsList[index],
+                            ),
+                          ),
+                        ),
+                      ),
+                      bannerAdWidget(),
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: screenHeight / 22,
+                          width: screenWidth / 4,
+                          decoration: BoxDecoration(
+                            color: themeColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(
+                                5,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            "बॉलीवुड",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height / 1,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            physics: NeverScrollableScrollPhysics(),
+                            reverse: false,
+                            // shrinkWrap: true,
+                            itemCount: bollywoodListDetails.length,
+                            itemBuilder: (context, index) => bollywoodWidget(
+                              bollywoodListDetails[index],
+                            ),
+                          ),
+                        ),
+                      ),
+                      bannerAdWidget(),
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: screenHeight / 22,
+                          width: screenWidth / 4,
+                          decoration: BoxDecoration(
+                            color: themeColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(
+                                5,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            "खेल",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height / 1,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            physics: NeverScrollableScrollPhysics(),
+                            reverse: false,
+                            // shrinkWrap: true,
+                            itemCount: khelDetailsList.length,
+                            itemBuilder: (context, index) => khelWidget(
+                              khelDetailsList[index],
+                            ),
+                          ),
+                        ),
+                      ),
+                      bannerAdWidget(),
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: screenHeight / 22,
+                          width: screenWidth / 4,
+                          decoration: BoxDecoration(
+                            color: themeColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(
+                                5,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            "दुनिया",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height / 1,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            physics: NeverScrollableScrollPhysics(),
+                            reverse: false,
+                            // shrinkWrap: true,
+                            itemCount: duniaDetailsList.length,
+                            itemBuilder: (context, index) => duniaWidget(
+                              duniaDetailsList[index],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  bannerAdWidget(),
+                ],
+              ),
+        bottomNavigationBar: Container(
+          height: screenHeight / 14,
+          width: screenWidth,
+          child: bannerAdWidget(),
+        ),
+      ),
     );
   }
 
@@ -630,6 +733,51 @@ class _SamacharScreenState extends State<SamacharScreen> {
     );
   }
 
+  Widget shareWidget() {
+    return InkWell(
+      onTap: () async {
+        final imageUrl = '${widget.image}';
+        final uri = Uri.parse(imageUrl);
+        final response = await http.get(uri);
+        final bytes = response.bodyBytes;
+        final temp = await getTemporaryDirectory();
+        final path = '${temp.path}/image.jpg';
+        log('IMAhgsfds===>   $path');
+        log(imageUrl);
+        File(path).writeAsBytesSync(bytes);
+        await Share.shareFiles([path],
+            text:
+                '*${widget.title}* "\n${widget.imageUrl}" \n*ताजा खबरे सबसे पहले पाने के लिए नीचे क्लिक कर ASB News India एप इंस्टॉल करे*  "\n${playStoreUrl}" ');
+        // Share.share(
+        //     "*${widget.title}*" + "\nअभी डाउनलोड करे " + playStoreUrl + "");
+      },
+      child: Container(
+        height: screenHeight / 25,
+        width: screenWidth,
+        margin: const EdgeInsets.symmetric(
+          horizontal: 20,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              "खबर शेयर करे ",
+              style: TextStyle(
+                color: themeColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Icon(
+              Icons.share,
+              color: themeColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget khelWidget(KhelDetailsModel itemss) {
     return Column(
       children: [
@@ -818,6 +966,29 @@ class _SamacharScreenState extends State<SamacharScreen> {
     );
   }
 
+  File? _displayImage;
+
+  Future<void> _download() async {
+    final response = await http.get(Uri.parse(_url));
+
+    // Get the image name
+    final imageName = path.basename(_url);
+    // Get the document directory path
+    final appDir = await getApplicationDocumentsDirectory();
+
+    // This is the saved image path
+    // You can use it to display the saved image later
+    final localPath = path.join(appDir.path, imageName);
+
+    // Downloading
+    final imageFile = File(localPath);
+    await imageFile.writeAsBytes(response.bodyBytes);
+
+    setState(() {
+      _displayImage = imageFile;
+    });
+    log('File===> $_displayImage');
+  }
 //------------------------------Api Call
 
   Future getRelatedNewsDetails() async {

@@ -5,6 +5,7 @@ class DeshDetailsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   DeshDetailsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class DeshDetailsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory DeshDetailsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class DeshDetailsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -34,6 +37,7 @@ class DeshDetailsModel {
     deshDetailsList['content']['rendered'] = this.newsContent;
     deshDetailsList['featured_image'] = this.newsImage;
     deshDetailsList["content"]["rendered"] = this.newsDiscription;
+    deshDetailsList["link"] = this.imageUrl;
 
     return deshDetailsList;
   }

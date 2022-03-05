@@ -5,6 +5,7 @@ class KhelDetailsModel {
   String newsContent = "";
   String newsImage = "";
   String newsDiscription = "";
+  String imageUrl = "";
 
   KhelDetailsModel({
     required this.newsId,
@@ -13,6 +14,7 @@ class KhelDetailsModel {
     required this.newsContent,
     required this.newsImage,
     required this.newsDiscription,
+    required this.imageUrl,
   });
 
   factory KhelDetailsModel.fromjson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class KhelDetailsModel {
       newsContent: json["content"]["rendered"].toString(),
       newsImage: json["featured_image"].toString(),
       newsDiscription: json["content"]["rendered"].toString(),
+      imageUrl: json["link"].toString(),
     );
   }
   Map<String, dynamic> tojson() {
@@ -34,6 +37,7 @@ class KhelDetailsModel {
     khelDetailsList['content']['rendered'] = this.newsContent;
     khelDetailsList['featured_image'] = this.newsImage;
     khelDetailsList["content"]["rendered"] = this.newsDiscription;
+    khelDetailsList["link"] = this.imageUrl;
 
     return khelDetailsList;
   }

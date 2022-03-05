@@ -5,15 +5,18 @@ import 'package:asb_news/models/news_by_select_district_model.dart';
 import 'package:asb_news/models/popularNewsModel.dart';
 import 'package:asb_news/models/releated_news_model.dart';
 import 'package:asb_news/models/slider_model.dart';
+import 'package:asb_news/models/state_news_model.dart';
 import 'package:asb_news/models/userNewsList.dart';
 import 'package:asb_news/screens/google_ads_screen.dart';
 import 'package:asb_news/screens/samachar_screen.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
+import 'package:asb_news/utils/constantKey.dart';
 import 'package:asb_news/utils/globalFunction.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -40,7 +43,14 @@ class _HomeScreenState extends State<HomeScreen> {
   List<RelatedNewsModel> relatedNewsList = [];
   List<PopularNewsModel> popularNewsList = [];
   List<SliderDataModel> sliderDataList = [];
+  List<StateNewsModel> stateNewsList = [];
+  SharedPreferences? _preferences;
 
+  List<NewsBySelectDistrict> districtNewsList = [];
+  var results;
+
+  String id = '';
+  String name = '';
   @override
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
@@ -55,12 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     getRelatedNewsDetails();
     getUserNews();
     getsliderDetails();
-  }
-
-  ScrollController _scrollController = ScrollController();
-
-  _scrollToBottom() {
-    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    getUserDeatils();
   }
 
   @override
@@ -111,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             var url = sliderDataList[i].sliderUrl;
                             launch(url);
-                            log("====>" + url);
+                            // log("====>" + url);
                           },
                           child: Container(
                             height: screenHeight / 6,
@@ -140,6 +145,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: defaultNews.length,
                             itemBuilder: (context, index) => newsDetailsWidget(
                               defaultNews[index],
+                            ),
+                          ),
+                        ),
+                      ),
+                      bannerAdWidget(),
+                    ],
+                  ),
+                  stateNameWidget(),
+                  Column(
+                    children: [
+                      Container(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height / 1.45,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: stateNewsList.length,
+                            itemBuilder: (context, index) => slectStateWidget(
+                              stateNewsList[index],
                             ),
                           ),
                         ),
@@ -250,6 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: items.newstitle,
                   image: items.newsImage,
                   description: items.newsContent,
+                  imageUrl: items.imageUrl,
                 ),
               ),
             );
@@ -292,6 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   items.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
                                 ),
                               ),
@@ -342,6 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: itemList[index].newstitle,
                       image: itemList[index].newsImage,
                       description: itemList[index].newsDiscription,
+                      imageUrl: itemList[index].imageUrl,
                     ),
                   ),
                 );
@@ -379,10 +408,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: Text(
                                       itemList[index].newstitle,
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
-                                      maxLines: 4,
+                                      maxLines: 3,
                                     ),
                                   ),
                                   Container(
@@ -424,6 +453,135 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget stateNameWidget() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 20,
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(
+            horizontal: 10,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                alignment: Alignment.center,
+                height: screenHeight / 20,
+                width: screenWidth / 1.1,
+                decoration: BoxDecoration(
+                  color: themeColor,
+                ),
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget slectStateWidget(StateNewsModel items) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 0,
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SamacharScreen(
+                  id: items.newsId,
+                  title: items.newstitle,
+                  image: items.newsImage,
+                  description: items.newsContent,
+                  imageUrl: items.imageUrl,
+                ),
+              ),
+            );
+          },
+          child: Card(
+            child: Container(
+              height: screenHeight / 7.6,
+              width: screenWidth / 1.05,
+              child: Column(
+                children: [
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: screenHeight / 10,
+                          width: screenWidth / 3,
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.only(topLeft: Radius.circular(5)),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                items.newsImage,
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: screenHeight / 8,
+                          width: screenWidth / 1.7,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    // top: 10,
+                                    ),
+                                child: Text(
+                                  items.newstitle,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 3,
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                  right: 10,
+                                  bottom: 10,
+                                ),
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  items.newsTiming,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Future getDefaultNewss() async {
     var url = Settings.defaultNews;
     var res = await GlobalFunction.apiGetRequestae(url);
@@ -437,8 +595,29 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  List<NewsBySelectDistrict> districtNewsList = [];
-  var results;
+  Future getSelectedStateNews(String sId) async {
+    var url = Settings.selectStateNews + sId.toString();
+    var res = await GlobalFunction.apiGetRequestae(url);
+    result = jsonDecode(res);
+    var _cryptoList = result as List;
+    setState(() {
+      stateNewsList.clear();
+      var listdata =
+          _cryptoList.map((e) => StateNewsModel.fromjson(e)).toList();
+      stateNewsList.addAll(listdata);
+    });
+  }
+
+  Future getUserDeatils() async {
+    _preferences = await SharedPreferences.getInstance();
+    setState(() {
+      id = _preferences!.getString(stateId).toString();
+      name = _preferences!.getString(stateName).toString();
+    });
+    getSelectedStateNews(id);
+
+    log("======>" + id + name);
+  }
 
   Future getNewsBySelectDistrict(id, title) async {
     var url = Settings.newsSelectByDistrict + id;
