@@ -34,13 +34,12 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
     super.initState();
   }
 
-  SharedPreferences? _preferences;
-
+  late SharedPreferences _preferences;
   saveData() async {
     _preferences = await SharedPreferences.getInstance();
 
-    idList = _preferences!.getStringList('$distIdList')!;
-    titleList = _preferences!.getStringList('$distTitleList')!;
+    idList = _preferences.getStringList('$distIdList')!;
+    titleList = _preferences.getStringList('$distTitleList')!;
   }
 
   List<GaramMasalaModel> garamMaslaList = [];
@@ -57,264 +56,276 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: themeColor,
-        title: Text(
-          "Top News",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePageScreen(
-                      districtIdList: idList, districtNameList: titleList),
-                ),
-              );
-            },
-            icon: Icon(
-              Icons.arrow_back,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomePageScreen(
+                      districtIdList: idList,
+                      districtNameList: titleList,
+                    )));
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: themeColor,
+          title: Text(
+            "Top News",
+            style: TextStyle(
               color: Colors.white,
-            )),
-      ),
-      body: ListView(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // topMargin,
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                alignment: Alignment.center,
-                height: screenHeight / 22,
-                width: screenWidth / 3,
-                child: Text(
-                  "गरम मसाला ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePageScreen(
+                        districtIdList: idList, districtNameList: titleList),
                   ),
+                );
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
+        ),
+        body: ListView(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // topMargin,
+                SizedBox(
+                  height: 10,
                 ),
-                decoration: BoxDecoration(
-                  color: themeColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(
-                      15,
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  alignment: Alignment.center,
+                  height: screenHeight / 22,
+                  width: screenWidth / 3,
+                  child: Text(
+                    "गरम मसाला ",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: themeColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(
+                        15,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: screenHeight / 1.45,
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  physics: NeverScrollableScrollPhysics(),
-                  reverse: false,
-                  shrinkWrap: true,
-                  itemCount: garamMaslaList.length,
-                  itemBuilder: (context, index) => newsCardWidget(
-                    garamMaslaList[index],
-                  ),
-                ),
-              ),
-              bannerAdWidget(),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                alignment: Alignment.center,
-                height: screenHeight / 22,
-                width: screenWidth / 3,
-                child: Text(
-                  "टेक्नोलॉजी",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  color: themeColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(
-                      15,
+                Container(
+                  height: screenHeight / 1.45,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: false,
+                    shrinkWrap: true,
+                    itemCount: garamMaslaList.length,
+                    itemBuilder: (context, index) => newsCardWidget(
+                      garamMaslaList[index],
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: screenHeight / 1.45,
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  physics: NeverScrollableScrollPhysics(),
-                  reverse: false,
-                  shrinkWrap: true,
-                  itemCount: techList.length,
-                  itemBuilder: (context, index) => technologyWidget(
-                    techList[index],
+                bannerAdWidget(),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
                   ),
-                ),
-              ),
-              bannerAdWidget(),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                alignment: Alignment.center,
-                height: screenHeight / 22,
-                width: screenWidth / 3,
-                child: Text(
-                  "हेल्थ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                  alignment: Alignment.center,
+                  height: screenHeight / 22,
+                  width: screenWidth / 3,
+                  child: Text(
+                    "टेक्नोलॉजी",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                decoration: BoxDecoration(
-                  color: themeColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(
-                      15,
+                  decoration: BoxDecoration(
+                    color: themeColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(
+                        15,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: screenHeight / 1.45,
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  physics: NeverScrollableScrollPhysics(),
-                  reverse: false,
-                  shrinkWrap: true,
-                  itemCount: healthyList.length,
-                  itemBuilder: (context, index) => healthWidget(
-                    healthyList[index],
-                  ),
-                ),
-              ),
-              bannerAdWidget(),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                alignment: Alignment.center,
-                height: screenHeight / 22,
-                width: screenWidth / 3,
-                child: Text(
-                  "बिज़नेस",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  color: themeColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(
-                      15,
+                Container(
+                  height: screenHeight / 1.45,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: false,
+                    shrinkWrap: true,
+                    itemCount: techList.length,
+                    itemBuilder: (context, index) => technologyWidget(
+                      techList[index],
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: screenHeight / 1.45,
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  physics: NeverScrollableScrollPhysics(),
-                  reverse: false,
-                  shrinkWrap: true,
-                  itemCount: vyaparDetailsList.length,
-                  itemBuilder: (context, index) => businessWidget(
-                    vyaparDetailsList[index],
+                bannerAdWidget(),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
                   ),
-                ),
-              ),
-              bannerAdWidget(),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                alignment: Alignment.center,
-                height: screenHeight / 22,
-                width: screenWidth / 3,
-                child: Text(
-                  "अध्यात्म",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                  alignment: Alignment.center,
+                  height: screenHeight / 22,
+                  width: screenWidth / 3,
+                  child: Text(
+                    "हेल्थ",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                decoration: BoxDecoration(
-                  color: themeColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(
-                      15,
+                  decoration: BoxDecoration(
+                    color: themeColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(
+                        15,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: screenHeight / 1.45,
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  physics: NeverScrollableScrollPhysics(),
-                  reverse: false,
-                  shrinkWrap: true,
-                  itemCount: adhyatmicDetailsList.length,
-                  itemBuilder: (context, index) => adhaytamWidget(
-                    adhyatmicDetailsList[index],
+                Container(
+                  height: screenHeight / 1.45,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: false,
+                    shrinkWrap: true,
+                    itemCount: healthyList.length,
+                    itemBuilder: (context, index) => healthWidget(
+                      healthyList[index],
+                    ),
                   ),
                 ),
-              ),
-              bannerAdWidget(),
-            ],
-          ),
-        ],
+                bannerAdWidget(),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  alignment: Alignment.center,
+                  height: screenHeight / 22,
+                  width: screenWidth / 3,
+                  child: Text(
+                    "बिज़नेस",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: themeColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(
+                        15,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: screenHeight / 1.45,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: false,
+                    shrinkWrap: true,
+                    itemCount: vyaparDetailsList.length,
+                    itemBuilder: (context, index) => businessWidget(
+                      vyaparDetailsList[index],
+                    ),
+                  ),
+                ),
+                bannerAdWidget(),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  alignment: Alignment.center,
+                  height: screenHeight / 22,
+                  width: screenWidth / 3,
+                  child: Text(
+                    "अध्यात्म",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: themeColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(
+                        15,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: screenHeight / 1.45,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    reverse: false,
+                    shrinkWrap: true,
+                    itemCount: adhyatmicDetailsList.length,
+                    itemBuilder: (context, index) => adhaytamWidget(
+                      adhyatmicDetailsList[index],
+                    ),
+                  ),
+                ),
+                bannerAdWidget(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -378,7 +389,9 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                                   items.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
+                                  maxLines: 3,
                                 ),
                               ),
                               Container(
@@ -469,7 +482,9 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                                   items.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
+                                  maxLines: 3,
                                 ),
                               ),
                               Container(
@@ -560,7 +575,9 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                                   items.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
+                                  maxLines: 3,
                                 ),
                               ),
                               Container(
@@ -651,7 +668,9 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                                   items.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
+                                  maxLines: 3,
                                 ),
                               ),
                               Container(
@@ -742,7 +761,9 @@ class _DhamakedarNewsScreenState extends State<DhamakedarNewsScreen> {
                                   items.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
+                                  maxLines: 3,
                                 ),
                               ),
                               Container(

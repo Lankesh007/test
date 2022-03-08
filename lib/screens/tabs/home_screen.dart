@@ -9,6 +9,8 @@ import 'package:asb_news/models/state_news_model.dart';
 import 'package:asb_news/models/userNewsList.dart';
 import 'package:asb_news/screens/google_ads_screen.dart';
 import 'package:asb_news/screens/samachar_screen.dart';
+import 'package:asb_news/screens/show_select_district_news.dart';
+import 'package:asb_news/screens/slider_web_view.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/constantKey.dart';
@@ -115,8 +117,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         return GestureDetector(
                           onTap: () {
                             var url = sliderDataList[i].sliderUrl;
-                            launch(url);
+                            log("url====>" + url);
+                            // launch(url);
                             // log("====>" + url);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SliderWebViewScreen(
+                                  url: url,
+                                ),
+                              ),
+                            );
                           },
                           child: Container(
                             height: screenHeight / 6,
@@ -210,6 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                   ),
                                   selectedNewsDetailsWidget(index),
+                                  orDekheWidget(item.id, item.title),
                                   bannerAdWidget(),
                                 ],
                               )
@@ -321,6 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
+                                  maxLines: 3,
                                 ),
                               ),
                               Container(
@@ -344,6 +357,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget orDekheWidget(String id, String title) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ShowSelectedNewsDistrict(
+                          id: id,
+                          title: title,
+                        )));
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 10,
+            ),
+            child: Text(
+              "और देखें",
+              style: TextStyle(
+                color: themeColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

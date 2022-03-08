@@ -12,6 +12,8 @@ import 'package:asb_news/screens/tabs/khel_tab_screen.dart';
 import 'package:asb_news/screens/tabs/technology_screen.dart';
 import 'package:asb_news/screens/tabs/uttarpradesh_screen.dart';
 import 'package:asb_news/screens/tabs/vyapar_screen.dart';
+import 'package:asb_news/screens/web_view_contact_us.dart';
+import 'package:asb_news/screens/web_view_privacy_policy.dart';
 import 'package:asb_news/utils/api.dart';
 import 'package:asb_news/utils/color.dart';
 import 'package:asb_news/utils/globalFunction.dart';
@@ -19,6 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:new_version/new_version.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class HomePageScreen extends StatefulWidget {
   final List districtIdList;
@@ -412,33 +416,54 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ),
             ),
           ),
-          Container(
-            margin: const EdgeInsets.only(
-              left: 10,
-              top: 10,
-            ),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Privacy Policy",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: themeColor,
+          InkWell(
+            onTap: () {
+              // launch("https://www.asbnewsindia.com/privacy-policy/");
+              // WebView(
+              //   initialUrl: "https://www.asbnewsindia.com/privacy-policy/",
+              //   javascriptMode: JavascriptMode.unrestricted,
+              // );
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => WebViewScreen()));
+            },
+            child: Container(
+              margin: const EdgeInsets.only(
+                left: 10,
+                top: 10,
+              ),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Privacy Policy",
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: themeColor,
+                ),
               ),
             ),
           ),
-          Container(
-            margin: const EdgeInsets.only(
-              left: 10,
-              top: 10,
-            ),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Contact Us",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: themeColor,
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => WebViewContactUsScreen(),
+                ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(
+                left: 10,
+                top: 10,
+              ),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Contact Us",
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: themeColor,
+                ),
               ),
             ),
           ),

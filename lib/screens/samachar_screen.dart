@@ -517,7 +517,8 @@ class _SamacharScreenState extends State<SamacharScreen> {
                 child: Text(
                   items.title,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                   maxLines: 3,
                 ),
@@ -603,6 +604,7 @@ class _SamacharScreenState extends State<SamacharScreen> {
                                   itemss.title,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
                                   maxLines: 3,
                                 ),
@@ -697,6 +699,7 @@ class _SamacharScreenState extends State<SamacharScreen> {
                                   itemss.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
                                   maxLines: 3,
                                 ),
@@ -836,6 +839,7 @@ class _SamacharScreenState extends State<SamacharScreen> {
                                   itemss.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
                                   maxLines: 3,
                                 ),
@@ -930,6 +934,7 @@ class _SamacharScreenState extends State<SamacharScreen> {
                                   itemss.newstitle,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
                                   maxLines: 3,
                                 ),
